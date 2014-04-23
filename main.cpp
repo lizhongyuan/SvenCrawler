@@ -7,7 +7,6 @@
 #include <signal.h>
 #include "./manager/csinglecraw.h"
 
-/*
 void SetCharset() {
   // 设置全局字符编码为UTF-8
   QTextCodec *codec = QTextCodec::codecForName("UTF-8");
@@ -71,11 +70,12 @@ int main(int argc, char *argv[])
 
   return a.exec();
 }
-*/
 
+/*
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
     return a.exec();
 }
+*/

@@ -11,6 +11,8 @@
 
 #include"stdlib.h"
 
+using namespace std;
+
 CSingleCraw::CSingleCraw(QObject *parent) : QObject(parent) {
   connect(&(this->timer_), SIGNAL(timeout()), this, SLOT(QuitEventLoop()));
   connect(&(this->http_get_task_timer_), SIGNAL(timeout()), this, SLOT(HttpGetSeoTask()));
@@ -51,6 +53,24 @@ CSingleCraw::HttpGetSeoTask()
   if (word_list.indexOf("###done###") >= 0)
   {
     this->seo_task_list_ = word_list;
+  }
+  this->mutex_.unlock();
+}
+
+
+/*
+ * get the SEO task
+ */
+void
+CSingleCraw::ThriftGetSeoTask(vector<SimulatorTask> SEOTaskVector)
+{
+  qDebug() << "HttpGetSeoTask";
+
+  // put the SEOTaskVector into class' vector
+  this->mutex_.lock();
+  for(vector<SimulatorTask>::iterator iter = SEOTaskVector.begin(); iter != SEOTaskVector.end(); iter++)
+  {
+      this->SEOTaskVector_.push_back(*iter);
   }
   this->mutex_.unlock();
 }

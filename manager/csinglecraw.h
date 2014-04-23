@@ -20,6 +20,8 @@
 #include "cpageloader/cpageloader.h"
 #include "gen-cpp/octopus_crawler_types.h"
 
+using namespace std;
+
 class CSingleCraw : public QObject
 {
   Q_OBJECT
@@ -89,12 +91,15 @@ public:
   QString id_;
   QString rank_;
 
+  vector<SimulatorTask> SEOTaskVector_;
+
   void Sleep(int msec);
 
 public slots:
   void QuitEventLoop();
 
   void HttpGetSeoTask();
+  void ThriftGetSeoTask(vector<SimulatorTask> SEOTaskVector);
 
 private:
   QString seo_task_list_;
