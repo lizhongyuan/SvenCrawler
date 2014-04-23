@@ -31,10 +31,12 @@ public:
   QList<KeyWordItem> getTaskWordList(QStringList&  key_word_lines,
                                      bool&         is_read_done);
 
+  QList<KeyWordItem> getTaskWordList(bool& is_read_done);
+
   /*
   QList<KeyWordItem> getTaskList(vector<SimulatorTask>  taskVector,
                                  bool&                  is_read_done);
-                  */
+  */
 
   CPageLoader* pageLoaderFactory();
   void getAndClickInputPos(CPageLoader*& pageloader,

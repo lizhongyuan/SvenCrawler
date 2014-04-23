@@ -95,7 +95,7 @@ CSingleCraw::getTaskWordList(SimulatorTask& curTask,
 
 
 QList<KeyWordItem>
-CSingleCraw::getTaskWordList(QStringList&  key_word_lines,
+CSingleCraw::getTaskWordList(QStringList&  key_words_lines,
                              bool&         is_read_done)
 {
     double day_week_rate[10] = {0, 0.16, 0.155, 0.152, 0.151, 0.15, 0.135, 0.133};
@@ -103,75 +103,66 @@ CSingleCraw::getTaskWordList(QStringList&  key_word_lines,
     qDebug() << "Today is:" << day_of_week << "Rate:" << day_week_rate[day_of_week];
 
     QList<KeyWordItem> word_list;
-    for (int i = 0; i < key_word_lines.count(); i++)
+    for (int i = 0; i < key_words_lines.count(); i++)
     {
-      if (key_word_lines[i] == "###done###")
+      if (key_words_lines[i] == "###done###")
       {
         is_read_done = true;
         break;
       }
-      QStringList tmp = key_word_lines[i].split("\t");
+      QStringList tmp = key_words_lines[i].split("\t");
       KeyWordItem kwi;
       if (tmp.count() >= 4)
       {
+        /*
         kwi.id         = tmp[0];
-        kwi.key_word   = tmp[1];
-        kwi.target_url = tmp[2];
-        kwi.baidu_index= tmp[3];
+        kwi.key_words   = tmp[1];
+        kwi.url_regex = tmp[2];
+        //kwi.baidu_index= tmp[3];
         kwi.ever_top   = tmp[4];
         kwi.cur_rank   = tmp.at(5).toInt();
-        // qDebug() << kwi.key_word << kwi.baidu_index;
+        // qDebug() << kwi.key_words << kwi.baidu_index;
         int baidu_index_chu_10 = kwi.baidu_index.toInt() * day_week_rate[day_of_week];
         for (int ki = 0; ki < baidu_index_chu_10; ki++)
         {
           word_list.append(kwi);
         }
+        */
       }
     }
     return word_list;
 }
 
-/*
 QList<KeyWordItem>
-getTaskList(vector<SimulatorTask>  taskVector,
-            bool&                  is_read_done)
+CSingleCraw::getTaskWordList(bool& is_read_done)
 {
-  double day_week_rate[10] = {0, 0.16, 0.155, 0.152, 0.151, 0.15, 0.135, 0.133};
+    double day_week_rate[10] = {0, 0.16, 0.155, 0.152, 0.151, 0.15, 0.135, 0.133};
+    int day_of_week = QDateTime::currentDateTime().date().dayOfWeek();
+    qDebug() << "Today is:" << day_of_week << "Rate:" << day_week_rate[day_of_week];
 
-  int day_of_week = QDateTime::currentDateTime().date().dayOfWeek();
-  qDebug() << "Today is:" << day_of_week << "Rate:" << day_week_rate[day_of_week];
+    QList<KeyWordItem> keyWordItemList;
 
-  QList<KeyWordItem> word_list;
-
-  //for (int i = 0; i < key_word_lines.count(); i++)
-  for(vector<SimulatorTask> iter = taskVector.begin(), iter!= taskVector.end(); iter++)
-  {
-    if (key_word_lines[i] == "###done###")
+    for (vector<SimulatorTask>::iterator iter = this->SEOTaskVector_.begin();
+         iter != this->SEOTaskVector_.end(); iter++)
     {
-      is_read_done = true;
-      break;
-    }
-    QStringList tmp = key_word_lines[i].split("\t");
-    KeyWordItem kwi;
-    if (tmp.count() >= 4)
-    {
-      kwi.id         = tmp[0];
-      kwi.key_word   = tmp[1];
-      kwi.target_url = tmp[2];
-      kwi.baidu_index= tmp[3];
-      kwi.ever_top   = tmp[4];
-      kwi.cur_rank   = tmp.at(5).toInt();
-      // qDebug() << kwi.key_word << kwi.baidu_index;
-      int baidu_index_chu_10 = kwi.baidu_index.toInt() * day_week_rate[day_of_week];
-      for (int ki = 0; ki < baidu_index_chu_10; ki++)
+
+      KeyWordItem kwi;
+
+      kwi.task_id = QString::number(iter->req_item.task_id);
+      kwi.click_count = iter->req_item.click_count;
+      kwi.city = QString::fromStdString(iter->req_item.city);
+      kwi.key_words = QString::fromStdString(iter->req_item.key_words);
+      kwi.url_regex = QString::fromStdString(iter->req_item.url_regex);
+
+      for (int i = 0; i < kwi.click_count; i++)
       {
-        word_list.append(kwi);
+        keyWordItemList.append(kwi);
       }
+
+      //}
     }
-  }
-  return word_list;
+    return keyWordItemList;
 }
-*/
 
 /*
  *
@@ -215,11 +206,11 @@ bool InBlackList(QString url)
 }
 
 void
-CSingleCraw::simulateInputKeyWord(QString key_word,
+CSingleCraw::simulateInputKeyWord(QString key_words,
                                   CPageLoader*& pageloader,
                                   QWebElement& input)
 {
-  for (int fi = 0; fi < key_word.length(); )
+  for (int fi = 0; fi < key_words.length(); )
   {
     QString rand_str = "";
     int     rand_int = 1 + rand() % 3;
@@ -238,9 +229,9 @@ CSingleCraw::simulateInputKeyWord(QString key_word,
 
     int word_len = rand() % 1 + 1;
     QString seg_word = "";
-    for (int word_i = fi; word_i < key_word.length() && word_i < fi + word_len; word_i++)
+    for (int word_i = fi; word_i < key_words.length() && word_i < fi + word_len; word_i++)
     {
-      seg_word += key_word[word_i];
+      seg_word += key_words[word_i];
     }
     fi += word_len;
     input.evaluateJavaScript("this.value += \"" + seg_word + "\"");
@@ -304,18 +295,18 @@ CSingleCraw::processSpanElem(QString& keyWordRank,
                              int& scroll_height,
                              int& window_height,
                              int& scroll_bar_maximun,
-                             QString target_url,
+                             QString url_regex,
                              CPageLoader*& pageloader,
                              bool& is_click,
                              bool& is_mousedown_ganji,
                              bool& is_prepare_ganji)
 {
   QString span_str = span_elem.toPlainText().trimmed();
-  target_url = target_url.replace("http://", "");
+  url_regex = url_regex.replace("http://", "");
   int x = a_elem.geometry().left() + (rand() % a_elem.geometry().width());
   int y = a_elem.geometry().top()  + (rand() % a_elem.geometry().height()) - scroll_height;
 
-  if (span_str.indexOf(target_url) >= 0 && is_mousedown_ganji == false && (!InBlackList(span_str))) {
+  if (span_str.indexOf(url_regex) >= 0 && is_mousedown_ganji == false && (!InBlackList(span_str))) {
     is_click = true;
     is_prepare_ganji = true;
   }
@@ -438,7 +429,7 @@ CSingleCraw::gotoNextPage(int page_idx,
 void
 CSingleCraw::getContentFromPages(bool& is_mousedown_ganji,
                                  CPageLoader*& pageloader,
-                                 QString target_url,
+                                 QString url_regex,
                                  int& max_page_load,
                                  int& scroll_height)
 {
@@ -473,7 +464,7 @@ CSingleCraw::getContentFromPages(bool& is_mousedown_ganji,
                             scroll_height,
                             window_height,
                             scroll_bar_maximun,
-                            target_url,
+                            url_regex,
                             pageloader,
                             is_click,
                             is_mousedown_ganji,
@@ -550,16 +541,18 @@ CSingleCraw::keyWordProcess(QList<KeyWordItem>& word_list,
   {
     int wi = rand() % word_list.count();
     //QString id       = word_list[wi].id;
-    this->id_       = word_list[wi].id;
-    QString key_word = word_list[wi].key_word;
-    QString target_url = word_list[wi].target_url;
 
-    if (key_word == "" || target_url == "") {
-      qDebug() << "Warning: key_word or target_url is NULL.";
+    //this->id_       = word_list[wi].id;
+    this->id_ = word_list[wi].task_id;
+    QString key_words = word_list[wi].key_words;
+    QString url_regex = word_list[wi].url_regex;
+
+    if (key_words == "" || url_regex == "") {
+      qDebug() << "Warning: key_words or url_regex is NULL.";
       this->Sleep(1000);
       continue;
     }
-    qDebug() << "Current Key Word:" << key_word << "Target Url:" << target_url;
+    qDebug() << "Current Key Word:" << key_words << "Target Url:" << url_regex;
 
     QElapsedTimer elapsed_timer;
     elapsed_timer.restart();
@@ -585,7 +578,7 @@ CSingleCraw::keyWordProcess(QList<KeyWordItem>& word_list,
 
     this->Sleep(rand() % 500 + 2000);
 
-    this->simulateInputKeyWord(key_word,
+    this->simulateInputKeyWord(key_words,
                                pageloader,
                                input);
 
@@ -594,7 +587,7 @@ CSingleCraw::keyWordProcess(QList<KeyWordItem>& word_list,
     this->getAndClickButton(dom,
                             pageloader);
 
-    qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") << "输入关键词：" << key_word << " Now At:" << pageloader->GetWebView()->url().toEncoded();
+    qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") << "输入关键词：" << key_words << " Now At:" << pageloader->GetWebView()->url().toEncoded();
 
     this->Sleep(rand() % 3000 + 5000);
 
@@ -611,12 +604,12 @@ CSingleCraw::keyWordProcess(QList<KeyWordItem>& word_list,
 
     this->getContentFromPages(is_mousedown_ganji,
                               pageloader,
-                              target_url,
+                              url_regex,
                               max_page_load,
                               scroll_height);
 
     if (is_mousedown_ganji == false) {
-      qDebug() << "Warning: Could not find target_url.";
+      qDebug() << "Warning: Could not find url_regex.";
     }
 
     //void waitFunction(QElapsedTimer& elapsed_timer)
@@ -635,25 +628,42 @@ void CSingleCraw::BaiduSEOTest(int spider_num)
   //CPageLoader *pageloader = NULL;
   while (true)
   {
+    /*
     this->mutex_.lock();
-    QString key_word_data = this->seo_task_list_;
+    QString key_words_data = this->seo_task_list_;
     this->mutex_.unlock();
+    */
 
-    if (key_word_data.trimmed() == "###done###")
+    /*
+    if (key_words_data.trimmed() == "###done###")
+    {
+      qDebug() << "No task right now. sleep 70s";
+      this->Sleep(70000);
+      continue;
+    }
+    */
+    if (this->SEOTaskVector_.empty())
     {
       qDebug() << "No task right now. sleep 70s";
       this->Sleep(70000);
       continue;
     }
 
-    QStringList key_word_lines = key_word_data.split("\n");
+    //QStringList key_words_lines = key_words_data.split("\n");
+
     bool is_read_done = false;
 
     /*
      * build the word_list
      */
-    QList<KeyWordItem> word_list = this->getTaskWordList(key_word_lines,
+
+    /*
+    QList<KeyWordItem> word_list = this->getTaskWordList(key_words_lines,
                                                          is_read_done);
+    */
+
+    QList<KeyWordItem> word_list = this->getTaskWordList(is_read_done);
+
     qDebug() << "word_list count():" << word_list.count();
     if (is_read_done == false) {
       qDebug() << "Could not finish reading key word list.";
