@@ -177,6 +177,13 @@ SEOdownloader::SEOTaskFunc()
 } //end
 
 vector<SimulatorTask>
+SEOdownloader::testSEOprocess2(vector<SimulatorTask>& reqTaskVector)
+{
+  vector<SimulatorTask> respTaskVector;
+  return respTaskVector;
+}
+
+vector<SimulatorTask>
 SEOdownloader::testSEOprocess(vector<SimulatorTask>& reqTask)
 {
   vector<SimulatorTask> respTaskVector;

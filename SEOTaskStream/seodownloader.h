@@ -17,6 +17,8 @@
 
 #include "bot_client.h"
 
+#include "manager/csinglecraw.h"
+
 
 namespace ganji { namespace crawler { namespace octopus_crawler { namespace downloader {
 
@@ -91,6 +93,7 @@ public:
 
 
   vector<SimulatorTask> testSEOprocess(vector<SimulatorTask>& reqTask);
+  vector<SimulatorTask> testSEOprocess2(vector<SimulatorTask>& reqTask);
 
 private:
   net::BotMessageHandler  octopus_server_conn_;  ///< 与bot server的连接
@@ -111,7 +114,7 @@ private:
   mutable boost::mutex SEOtask_lock_;
   mutable boost::mutex upload_lock_;
 
-  //CSingleCraw* singlecraw;
+  CSingleCraw* singlecraw;
 };
 
 
