@@ -7,6 +7,7 @@
 #include <signal.h>
 #include "./manager/csinglecraw.h"
 
+/*
 void SetCharset() {
   // 设置全局字符编码为UTF-8
   QTextCodec *codec = QTextCodec::codecForName("UTF-8");
@@ -37,10 +38,7 @@ int main(int argc, char *argv[])
   {
     spider_num = a.arguments().at(1).toInt();
   }
-
-  /*
-   * if argc >= 5, set the proxy's attribute value
-   */
+   // if argc >= 5, set the proxy's attribute value
   if (a.arguments().size() >= 5)
   {
     // 设置全局代理，整个应用程序生存范围。
@@ -59,9 +57,7 @@ int main(int argc, char *argv[])
 
   qDebug() << "Spider Num:" << spider_num;
 
-  /*
-   * crawler begin
-   */
+  // crawler begin
   CSingleCraw singlecraw;
   if (spider_num <= 0 || spider_num >= 100)
   {
@@ -75,13 +71,11 @@ int main(int argc, char *argv[])
 
   return a.exec();
 }
+*/
 
-
-/*
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
     return a.exec();
 }
-*/

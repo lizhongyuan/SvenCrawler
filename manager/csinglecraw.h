@@ -2,11 +2,13 @@
 #define CSINGLECRAW_H
 
 #ifndef LINUX
-#include<windows.h>
+//#include<windows.h>
 #endif
 
 #include <time.h>
 //#include <unistd.h>
+
+#include<vector>
 
 #include <QThread>
 #include <QObject>
@@ -14,10 +16,9 @@
 #include <QTimer>
 #include <QMutex>
 
-
-
 #include "KeyWordItem.h"
 #include "cpageloader/cpageloader.h"
+#include "gen-cpp/octopus_crawler_types.h"
 
 class CSingleCraw : public QObject
 {
@@ -27,6 +28,12 @@ public:
 
   QList<KeyWordItem> getTaskWordList(QStringList&  key_word_lines,
                                      bool&         is_read_done);
+
+  /*
+  QList<KeyWordItem> getTaskList(vector<SimulatorTask>  taskVector,
+                                 bool&                  is_read_done);
+                  */
+
   CPageLoader* pageLoaderFactory();
   void getAndClickInputPos(CPageLoader*& pageloader,
                            QWebElement& input);
@@ -55,7 +62,8 @@ public:
                int& scroll_bar_maximun);
 
   void
-  processSpanElem(QWebElement& span_elem,
+  processSpanElem(QString& keyWordRank,
+                  QWebElement& span_elem,
                   QWebElement& a_elem,
                   int& scroll_height,
                   int& window_height,
@@ -72,10 +80,15 @@ public:
                int& spider_num);
 
   void Start(int spider_num);
+  //void Start(vector<SimulatorTask>& taskVector, int spider_num);
 
   QEventLoop eventloop_;
   QTimer timer_;
   QTimer http_get_task_timer_;
+
+  QString id_;
+  QString rank_;
+
   void Sleep(int msec);
 
 public slots:
@@ -89,6 +102,7 @@ private:
 
 public:
   void BaiduSEOTest(int spider_num); // baidu.com 刷百度SEO
+  //void BaiduSEOTest(vector<SimulatorTask>& taskVector, int spider_num); // baidu.com 刷百度SEO
 };
 
 class SeoRankRepotThread : public QThread {

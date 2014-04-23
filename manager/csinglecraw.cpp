@@ -7,7 +7,9 @@
 #include <QSqlError>
 #include <QDebug>
 #include <QTest>
-#include "../conf/csqlhelper.h"
+#include "./conf/csqlhelper.h"
+
+#include"stdlib.h"
 
 CSingleCraw::CSingleCraw(QObject *parent) : QObject(parent) {
   connect(&(this->timer_), SIGNAL(timeout()), this, SLOT(QuitEventLoop()));
@@ -20,6 +22,14 @@ void CSingleCraw::Start(int spider_num)
 {
   this->BaiduSEOTest(spider_num);
 }
+
+/*
+void
+CSingleCraw::Start(vector<SimulatorTask>& taskVector, int spider_num)
+{
+  this->BaiduSEOTest(taskVector, spider_num);
+}
+*/
 
 void CSingleCraw::QuitEventLoop()
 {
@@ -57,9 +67,16 @@ void CSingleCraw::Sleep(int msec)
 }
 
 
+/*
+QList<KeyWordItem>
+CSingleCraw::getTaskWordList(SimulatorTask& curTask,
+                             bool&          is_read_done)
+*/
+
+
 QList<KeyWordItem>
 CSingleCraw::getTaskWordList(QStringList&  key_word_lines,
-                              bool&         is_read_done)
+                             bool&         is_read_done)
 {
     double day_week_rate[10] = {0, 0.16, 0.155, 0.152, 0.151, 0.15, 0.135, 0.133};
     int day_of_week = QDateTime::currentDateTime().date().dayOfWeek();
@@ -93,6 +110,48 @@ CSingleCraw::getTaskWordList(QStringList&  key_word_lines,
     }
     return word_list;
 }
+
+/*
+QList<KeyWordItem>
+getTaskList(vector<SimulatorTask>  taskVector,
+            bool&                  is_read_done)
+{
+  double day_week_rate[10] = {0, 0.16, 0.155, 0.152, 0.151, 0.15, 0.135, 0.133};
+
+  int day_of_week = QDateTime::currentDateTime().date().dayOfWeek();
+  qDebug() << "Today is:" << day_of_week << "Rate:" << day_week_rate[day_of_week];
+
+  QList<KeyWordItem> word_list;
+
+  //for (int i = 0; i < key_word_lines.count(); i++)
+  for(vector<SimulatorTask> iter = taskVector.begin(), iter!= taskVector.end(); iter++)
+  {
+    if (key_word_lines[i] == "###done###")
+    {
+      is_read_done = true;
+      break;
+    }
+    QStringList tmp = key_word_lines[i].split("\t");
+    KeyWordItem kwi;
+    if (tmp.count() >= 4)
+    {
+      kwi.id         = tmp[0];
+      kwi.key_word   = tmp[1];
+      kwi.target_url = tmp[2];
+      kwi.baidu_index= tmp[3];
+      kwi.ever_top   = tmp[4];
+      kwi.cur_rank   = tmp.at(5).toInt();
+      // qDebug() << kwi.key_word << kwi.baidu_index;
+      int baidu_index_chu_10 = kwi.baidu_index.toInt() * day_week_rate[day_of_week];
+      for (int ki = 0; ki < baidu_index_chu_10; ki++)
+      {
+        word_list.append(kwi);
+      }
+    }
+  }
+  return word_list;
+}
+*/
 
 /*
  *
@@ -219,7 +278,8 @@ CSingleCraw::getSpanElem(QWebElement& span_elem, QWebElement& curColl)
 }
 
 void
-CSingleCraw::processSpanElem(QWebElement& span_elem,
+CSingleCraw::processSpanElem(QString& keyWordRank,
+                             QWebElement& span_elem,
                              QWebElement& a_elem,
                              int& scroll_height,
                              int& window_height,
@@ -280,11 +340,17 @@ CSingleCraw::processSpanElem(QWebElement& span_elem,
     pageloader->m_mynetworkAccessManager.SetRefuseUrl(refuse_url);
     qDebug() << "Link Pos scrolled:" << x << y;
     QTest::mouseEvent(QTest::MouseClick, pageloader->GetWebView(), Qt::LeftButton, Qt::NoModifier, QPoint(x, y), -1);
-    //qDebug() << "Link Click:" << a_elem.attribute("href") << a_elem.toPlainText().trimmed() << " Index:" << a_coll[ai].attribute("id");
+    this->rank_ = keyWordRank;
     this->Sleep(rand() % 1000 + 2000);
 
     if (is_prepare_ganji == true)
     {
+      SeoRankRepotThread seo_rank_report_thread;
+      seo_rank_report_thread.id_   = this->id_;
+      //seo_rank_report_thread.rank_ = a_coll[ai].attribute("id");
+      seo_rank_report_thread.rank_ = this->rank_;
+      seo_rank_report_thread.run();
+
       this->Sleep(rand() % 500 + 1000);
       is_mousedown_ganji = true;
     }
@@ -368,6 +434,7 @@ CSingleCraw::getContentFromPages(bool& is_mousedown_ganji,
     QWebElementCollection a_coll = dom.findAll("div.result");       // make sure1
     for (int ai = 0; ai < a_coll.count(); ai++)
     {
+      QString keyWordRank = a_coll[ai].attribute("id");
       QWebElement a_elem = a_coll[ai].findFirst("a");
       QWebElement span_elem = a_coll[ai].findFirst("font[size='-1'] span.g");       //make sure2
 
@@ -380,7 +447,8 @@ CSingleCraw::getContentFromPages(bool& is_mousedown_ganji,
       bool is_click = false;
       bool is_prepare_ganji = false;
 
-      this->processSpanElem(span_elem,
+      this->processSpanElem(keyWordRank,
+                            span_elem,
                             a_elem,
                             scroll_height,
                             window_height,
@@ -461,7 +529,8 @@ CSingleCraw::keyWordProcess(QList<KeyWordItem>& word_list,
   while (time(NULL) - pre_time < 400)
   {
     int wi = rand() % word_list.count();
-    QString id       = word_list[wi].id;
+    //QString id       = word_list[wi].id;
+    this->id_       = word_list[wi].id;
     QString key_word = word_list[wi].key_word;
     QString target_url = word_list[wi].target_url;
 
@@ -599,4 +668,12 @@ void CSingleCraw::BaiduSEOTest(int spider_num)
 
 void SeoRankRepotThread::run()
 {
+    CHttpGet http_get;
+    //QString url = QString("http://hhgjgame006.3322.org:19999/seo_task_set_rank.php?id=") + this->id_ + QString("&rank=") + this->rank_;
+    QString url = QString("http://www.baidu.com");
+    qDebug() << "SeoRankReport:" << url;
+    qDebug()<<"The id is "<<this->id_;
+    qDebug()<<"The rand is "<<this->rank_;
+    system("pause");
+    http_get.doDownload(QUrl(url));
 }
