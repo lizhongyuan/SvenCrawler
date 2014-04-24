@@ -91,12 +91,24 @@ struct UrlType {
 
 extern const std::map<int, const char*> _UrlType_VALUES_TO_NAMES;
 
+struct UpdateTaskTypes {
+  enum type {
+    KCRAWLERBOT = 0,
+    KSEOBOT = 1,
+    KTEMPALTE = 2,
+    KDIAL = 3
+  };
+};
+
+extern const std::map<int, const char*> _UpdateTaskTypes_VALUES_TO_NAMES;
+
 struct BotTasktypes {
   enum type {
     KCRAWLERTASK = 0,
-    KCRAWLERTEMPLATEUPDATE = 1,
-    KBOTUPDATE = 2,
-    KSEOTASK = 3
+    KSEOTASK = 1,
+    KCRAWLERTEMPLATEUPDATE = 2,
+    KBOTUPDATE = 3,
+    KDIALTASK = 4
   };
 };
 
@@ -552,6 +564,49 @@ class ExtractItem {
 
 void swap(ExtractItem &a, ExtractItem &b);
 
+typedef struct _ExtractItems__isset {
+  _ExtractItems__isset() : extract_task_list(false) {}
+  bool extract_task_list;
+} _ExtractItems__isset;
+
+class ExtractItems {
+ public:
+
+  static const char* ascii_fingerprint; // = "92B6DF721AAFD189D4D0E6350420465D";
+  static const uint8_t binary_fingerprint[16]; // = {0x92,0xB6,0xDF,0x72,0x1A,0xAF,0xD1,0x89,0xD4,0xD0,0xE6,0x35,0x04,0x20,0x46,0x5D};
+
+  ExtractItems() {
+  }
+
+  virtual ~ExtractItems() throw() {}
+
+  std::vector<ExtractItem>  extract_task_list;
+
+  _ExtractItems__isset __isset;
+
+  void __set_extract_task_list(const std::vector<ExtractItem> & val) {
+    extract_task_list = val;
+  }
+
+  bool operator == (const ExtractItems & rhs) const
+  {
+    if (!(extract_task_list == rhs.extract_task_list))
+      return false;
+    return true;
+  }
+  bool operator != (const ExtractItems &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const ExtractItems & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+void swap(ExtractItems &a, ExtractItems &b);
+
 typedef struct _MatchedResultItem__isset {
   _MatchedResultItem__isset() : self_result(false), sub_result_list(false), is_ok(false), err_info(false) {}
   bool self_result;
@@ -677,6 +732,357 @@ class DownloadedBodyItem {
 };
 
 void swap(DownloadedBodyItem &a, DownloadedBodyItem &b);
+
+typedef struct _DialInfoItem__isset {
+  _DialInfoItem__isset() : user(false), pwd(false) {}
+  bool user;
+  bool pwd;
+} _DialInfoItem__isset;
+
+class DialInfoItem {
+ public:
+
+  static const char* ascii_fingerprint; // = "07A9615F837F7D0A952B595DD3020972";
+  static const uint8_t binary_fingerprint[16]; // = {0x07,0xA9,0x61,0x5F,0x83,0x7F,0x7D,0x0A,0x95,0x2B,0x59,0x5D,0xD3,0x02,0x09,0x72};
+
+  DialInfoItem() : user(), pwd() {
+  }
+
+  virtual ~DialInfoItem() throw() {}
+
+  std::string user;
+  std::string pwd;
+
+  _DialInfoItem__isset __isset;
+
+  void __set_user(const std::string& val) {
+    user = val;
+  }
+
+  void __set_pwd(const std::string& val) {
+    pwd = val;
+  }
+
+  bool operator == (const DialInfoItem & rhs) const
+  {
+    if (!(user == rhs.user))
+      return false;
+    if (!(pwd == rhs.pwd))
+      return false;
+    return true;
+  }
+  bool operator != (const DialInfoItem &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const DialInfoItem & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+void swap(DialInfoItem &a, DialInfoItem &b);
+
+typedef struct _DialRespItem__isset {
+  _DialRespItem__isset() : ip(false), port(false) {}
+  bool ip;
+  bool port;
+} _DialRespItem__isset;
+
+class DialRespItem {
+ public:
+
+  static const char* ascii_fingerprint; // = "EEBC915CE44901401D881E6091423036";
+  static const uint8_t binary_fingerprint[16]; // = {0xEE,0xBC,0x91,0x5C,0xE4,0x49,0x01,0x40,0x1D,0x88,0x1E,0x60,0x91,0x42,0x30,0x36};
+
+  DialRespItem() : ip(), port(0) {
+  }
+
+  virtual ~DialRespItem() throw() {}
+
+  std::string ip;
+  int32_t port;
+
+  _DialRespItem__isset __isset;
+
+  void __set_ip(const std::string& val) {
+    ip = val;
+  }
+
+  void __set_port(const int32_t val) {
+    port = val;
+  }
+
+  bool operator == (const DialRespItem & rhs) const
+  {
+    if (!(ip == rhs.ip))
+      return false;
+    if (!(port == rhs.port))
+      return false;
+    return true;
+  }
+  bool operator != (const DialRespItem &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const DialRespItem & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+void swap(DialRespItem &a, DialRespItem &b);
+
+typedef struct _UpdateReqItem__isset {
+  _UpdateReqItem__isset() : task_id(false), url(false), target_ip(false), node_id(false), timestamp(false), version(false), update_type(false), template_name(false), template_type(false), dial_info(false) {}
+  bool task_id;
+  bool url;
+  bool target_ip;
+  bool node_id;
+  bool timestamp;
+  bool version;
+  bool update_type;
+  bool template_name;
+  bool template_type;
+  bool dial_info;
+} _UpdateReqItem__isset;
+
+class UpdateReqItem {
+ public:
+
+  static const char* ascii_fingerprint; // = "F4F95FBAFCD0D6402E66FF49B8F546CD";
+  static const uint8_t binary_fingerprint[16]; // = {0xF4,0xF9,0x5F,0xBA,0xFC,0xD0,0xD6,0x40,0x2E,0x66,0xFF,0x49,0xB8,0xF5,0x46,0xCD};
+
+  UpdateReqItem() : task_id(0), url(), target_ip(), node_id(), timestamp(0), version(), update_type((UpdateTaskTypes::type)0), template_name(), template_type((TemplateType::type)0) {
+  }
+
+  virtual ~UpdateReqItem() throw() {}
+
+  int32_t task_id;
+  std::string url;
+  std::string target_ip;
+  std::string node_id;
+  int32_t timestamp;
+  std::string version;
+  UpdateTaskTypes::type update_type;
+  std::string template_name;
+  TemplateType::type template_type;
+  std::vector<std::string>  dial_info;
+
+  _UpdateReqItem__isset __isset;
+
+  void __set_task_id(const int32_t val) {
+    task_id = val;
+  }
+
+  void __set_url(const std::string& val) {
+    url = val;
+  }
+
+  void __set_target_ip(const std::string& val) {
+    target_ip = val;
+  }
+
+  void __set_node_id(const std::string& val) {
+    node_id = val;
+  }
+
+  void __set_timestamp(const int32_t val) {
+    timestamp = val;
+  }
+
+  void __set_version(const std::string& val) {
+    version = val;
+  }
+
+  void __set_update_type(const UpdateTaskTypes::type val) {
+    update_type = val;
+  }
+
+  void __set_template_name(const std::string& val) {
+    template_name = val;
+  }
+
+  void __set_template_type(const TemplateType::type val) {
+    template_type = val;
+  }
+
+  void __set_dial_info(const std::vector<std::string> & val) {
+    dial_info = val;
+  }
+
+  bool operator == (const UpdateReqItem & rhs) const
+  {
+    if (!(task_id == rhs.task_id))
+      return false;
+    if (!(url == rhs.url))
+      return false;
+    if (!(target_ip == rhs.target_ip))
+      return false;
+    if (!(node_id == rhs.node_id))
+      return false;
+    if (!(timestamp == rhs.timestamp))
+      return false;
+    if (!(version == rhs.version))
+      return false;
+    if (!(update_type == rhs.update_type))
+      return false;
+    if (!(template_name == rhs.template_name))
+      return false;
+    if (!(template_type == rhs.template_type))
+      return false;
+    if (!(dial_info == rhs.dial_info))
+      return false;
+    return true;
+  }
+  bool operator != (const UpdateReqItem &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const UpdateReqItem & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+void swap(UpdateReqItem &a, UpdateReqItem &b);
+
+typedef struct _UpdateRespItem__isset {
+  _UpdateRespItem__isset() : task_id(false), node_id(false), version(false), timestamp(false), body(false), dial_resp(false) {}
+  bool task_id;
+  bool node_id;
+  bool version;
+  bool timestamp;
+  bool body;
+  bool dial_resp;
+} _UpdateRespItem__isset;
+
+class UpdateRespItem {
+ public:
+
+  static const char* ascii_fingerprint; // = "51373B95DD56D8407B53057B4AF2633A";
+  static const uint8_t binary_fingerprint[16]; // = {0x51,0x37,0x3B,0x95,0xDD,0x56,0xD8,0x40,0x7B,0x53,0x05,0x7B,0x4A,0xF2,0x63,0x3A};
+
+  UpdateRespItem() : task_id(0), node_id(), version(), timestamp(), body() {
+  }
+
+  virtual ~UpdateRespItem() throw() {}
+
+  int32_t task_id;
+  std::string node_id;
+  std::string version;
+  std::string timestamp;
+  std::string body;
+  std::vector<DialRespItem>  dial_resp;
+
+  _UpdateRespItem__isset __isset;
+
+  void __set_task_id(const int32_t val) {
+    task_id = val;
+  }
+
+  void __set_node_id(const std::string& val) {
+    node_id = val;
+  }
+
+  void __set_version(const std::string& val) {
+    version = val;
+  }
+
+  void __set_timestamp(const std::string& val) {
+    timestamp = val;
+  }
+
+  void __set_body(const std::string& val) {
+    body = val;
+  }
+
+  void __set_dial_resp(const std::vector<DialRespItem> & val) {
+    dial_resp = val;
+  }
+
+  bool operator == (const UpdateRespItem & rhs) const
+  {
+    if (!(task_id == rhs.task_id))
+      return false;
+    if (!(node_id == rhs.node_id))
+      return false;
+    if (!(version == rhs.version))
+      return false;
+    if (!(timestamp == rhs.timestamp))
+      return false;
+    if (!(body == rhs.body))
+      return false;
+    if (!(dial_resp == rhs.dial_resp))
+      return false;
+    return true;
+  }
+  bool operator != (const UpdateRespItem &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const UpdateRespItem & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+void swap(UpdateRespItem &a, UpdateRespItem &b);
+
+typedef struct _UpdateTask__isset {
+  _UpdateTask__isset() : req_item(false), resp_item(false) {}
+  bool req_item;
+  bool resp_item;
+} _UpdateTask__isset;
+
+class UpdateTask {
+ public:
+
+  static const char* ascii_fingerprint; // = "C36A38A28C251CDDB494A9873CED578F";
+  static const uint8_t binary_fingerprint[16]; // = {0xC3,0x6A,0x38,0xA2,0x8C,0x25,0x1C,0xDD,0xB4,0x94,0xA9,0x87,0x3C,0xED,0x57,0x8F};
+
+  UpdateTask() {
+  }
+
+  virtual ~UpdateTask() throw() {}
+
+  UpdateReqItem req_item;
+  UpdateRespItem resp_item;
+
+  _UpdateTask__isset __isset;
+
+  void __set_req_item(const UpdateReqItem& val) {
+    req_item = val;
+  }
+
+  void __set_resp_item(const UpdateRespItem& val) {
+    resp_item = val;
+  }
+
+  bool operator == (const UpdateTask & rhs) const
+  {
+    if (!(req_item == rhs.req_item))
+      return false;
+    if (!(resp_item == rhs.resp_item))
+      return false;
+    return true;
+  }
+  bool operator != (const UpdateTask &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const UpdateTask & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+void swap(UpdateTask &a, UpdateTask &b);
 
 typedef struct _DedupExistItem__isset {
   _DedupExistItem__isset() : is_exists(false), item_info(false) {}
@@ -938,148 +1344,6 @@ class SimulatorTask {
 
 void swap(SimulatorTask &a, SimulatorTask &b);
 
-typedef struct _UpdateReqItem__isset {
-  _UpdateReqItem__isset() : task_id(false), url(false), node_id(false), timestamp(false), version(false) {}
-  bool task_id;
-  bool url;
-  bool node_id;
-  bool timestamp;
-  bool version;
-} _UpdateReqItem__isset;
-
-class UpdateReqItem {
- public:
-
-  static const char* ascii_fingerprint; // = "3DEA490DCFDBF7F9065EFB84569A610F";
-  static const uint8_t binary_fingerprint[16]; // = {0x3D,0xEA,0x49,0x0D,0xCF,0xDB,0xF7,0xF9,0x06,0x5E,0xFB,0x84,0x56,0x9A,0x61,0x0F};
-
-  UpdateReqItem() : task_id(0), url(), node_id(), timestamp(0), version() {
-  }
-
-  virtual ~UpdateReqItem() throw() {}
-
-  int32_t task_id;
-  std::string url;
-  std::string node_id;
-  int32_t timestamp;
-  std::string version;
-
-  _UpdateReqItem__isset __isset;
-
-  void __set_task_id(const int32_t val) {
-    task_id = val;
-  }
-
-  void __set_url(const std::string& val) {
-    url = val;
-  }
-
-  void __set_node_id(const std::string& val) {
-    node_id = val;
-  }
-
-  void __set_timestamp(const int32_t val) {
-    timestamp = val;
-  }
-
-  void __set_version(const std::string& val) {
-    version = val;
-  }
-
-  bool operator == (const UpdateReqItem & rhs) const
-  {
-    if (!(task_id == rhs.task_id))
-      return false;
-    if (!(url == rhs.url))
-      return false;
-    if (!(node_id == rhs.node_id))
-      return false;
-    if (!(timestamp == rhs.timestamp))
-      return false;
-    if (!(version == rhs.version))
-      return false;
-    return true;
-  }
-  bool operator != (const UpdateReqItem &rhs) const {
-    return !(*this == rhs);
-  }
-
-  bool operator < (const UpdateReqItem & ) const;
-
-  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
-  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
-
-};
-
-void swap(UpdateReqItem &a, UpdateReqItem &b);
-
-typedef struct _UpdateRespItem__isset {
-  _UpdateRespItem__isset() : task_id(false), node_id(false), version(false), timestamp(false) {}
-  bool task_id;
-  bool node_id;
-  bool version;
-  bool timestamp;
-} _UpdateRespItem__isset;
-
-class UpdateRespItem {
- public:
-
-  static const char* ascii_fingerprint; // = "C4A8A7FE71C2DB9CB73D92862AA4C591";
-  static const uint8_t binary_fingerprint[16]; // = {0xC4,0xA8,0xA7,0xFE,0x71,0xC2,0xDB,0x9C,0xB7,0x3D,0x92,0x86,0x2A,0xA4,0xC5,0x91};
-
-  UpdateRespItem() : task_id(0), node_id(), version(), timestamp() {
-  }
-
-  virtual ~UpdateRespItem() throw() {}
-
-  int32_t task_id;
-  std::string node_id;
-  std::string version;
-  std::string timestamp;
-
-  _UpdateRespItem__isset __isset;
-
-  void __set_task_id(const int32_t val) {
-    task_id = val;
-  }
-
-  void __set_node_id(const std::string& val) {
-    node_id = val;
-  }
-
-  void __set_version(const std::string& val) {
-    version = val;
-  }
-
-  void __set_timestamp(const std::string& val) {
-    timestamp = val;
-  }
-
-  bool operator == (const UpdateRespItem & rhs) const
-  {
-    if (!(task_id == rhs.task_id))
-      return false;
-    if (!(node_id == rhs.node_id))
-      return false;
-    if (!(version == rhs.version))
-      return false;
-    if (!(timestamp == rhs.timestamp))
-      return false;
-    return true;
-  }
-  bool operator != (const UpdateRespItem &rhs) const {
-    return !(*this == rhs);
-  }
-
-  bool operator < (const UpdateRespItem & ) const;
-
-  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
-  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
-
-};
-
-void swap(UpdateRespItem &a, UpdateRespItem &b);
-
 typedef struct _PcNode__isset {
   _PcNode__isset() : node_id(false), name(false), time_stamp(false), secret(false), state(false) {}
   bool node_id;
@@ -1155,57 +1419,6 @@ class PcNode {
 
 void swap(PcNode &a, PcNode &b);
 
-typedef struct _UpdateTask__isset {
-  _UpdateTask__isset() : req_item(false), resp_item(false) {}
-  bool req_item;
-  bool resp_item;
-} _UpdateTask__isset;
-
-class UpdateTask {
- public:
-
-  static const char* ascii_fingerprint; // = "80C2F8269D96B440D367475AC0BB2A8D";
-  static const uint8_t binary_fingerprint[16]; // = {0x80,0xC2,0xF8,0x26,0x9D,0x96,0xB4,0x40,0xD3,0x67,0x47,0x5A,0xC0,0xBB,0x2A,0x8D};
-
-  UpdateTask() {
-  }
-
-  virtual ~UpdateTask() throw() {}
-
-  UpdateReqItem req_item;
-  UpdateRespItem resp_item;
-
-  _UpdateTask__isset __isset;
-
-  void __set_req_item(const UpdateReqItem& val) {
-    req_item = val;
-  }
-
-  void __set_resp_item(const UpdateRespItem& val) {
-    resp_item = val;
-  }
-
-  bool operator == (const UpdateTask & rhs) const
-  {
-    if (!(req_item == rhs.req_item))
-      return false;
-    if (!(resp_item == rhs.resp_item))
-      return false;
-    return true;
-  }
-  bool operator != (const UpdateTask &rhs) const {
-    return !(*this == rhs);
-  }
-
-  bool operator < (const UpdateTask & ) const;
-
-  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
-  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
-
-};
-
-void swap(UpdateTask &a, UpdateTask &b);
-
 typedef struct _BotMessage__isset {
   _BotMessage__isset() : down_load_task(false), simulator_task(false), update_task(false), bot_task_types(false), token(false) {}
   bool down_load_task;
@@ -1218,8 +1431,8 @@ typedef struct _BotMessage__isset {
 class BotMessage {
  public:
 
-  static const char* ascii_fingerprint; // = "C80ED6AC6ED2EA757A14ED64AAE77DFA";
-  static const uint8_t binary_fingerprint[16]; // = {0xC8,0x0E,0xD6,0xAC,0x6E,0xD2,0xEA,0x75,0x7A,0x14,0xED,0x64,0xAA,0xE7,0x7D,0xFA};
+  static const char* ascii_fingerprint; // = "9471C45333456D5CA56A7B3F5E3478FE";
+  static const uint8_t binary_fingerprint[16]; // = {0x94,0x71,0xC4,0x53,0x33,0x45,0x6D,0x5C,0xA5,0x6A,0x7B,0x3F,0x5E,0x34,0x78,0xFE};
 
   BotMessage() : bot_task_types((BotTasktypes::type)0), token() {
   }

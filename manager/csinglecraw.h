@@ -31,7 +31,9 @@ public:
   QList<KeyWordItem> getTaskWordList(QStringList&  key_word_lines,
                                      bool&         is_read_done);
 
-  QList<KeyWordItem> getTaskWordList(bool& is_read_done);
+  QList<KeyWordItem> getTaskWordList(vector<SimulatorTask> reqTaskVector,
+                                     vector<SimulatorTask>& respTaskVector,
+                                     bool& is_read_done);
 
   /*
   QList<KeyWordItem> getTaskList(vector<SimulatorTask>  taskVector,
@@ -83,7 +85,9 @@ public:
                QList<KeyWordItem>& word_lsit,
                int& spider_num);
 
-  void Start(int spider_num);
+  QString getCurTime();
+
+  void Start(vector<SimulatorTask> reqTaskVector, int spider_num);
   //void Start(vector<SimulatorTask>& taskVector, int spider_num);
 
   QEventLoop eventloop_;
@@ -93,7 +97,8 @@ public:
   QString id_;
   QString rank_;
 
-  vector<SimulatorTask> SEOTaskVector_;
+  //vector<SimulatorTask> SEOTaskVector_;
+  //vector<SimulatorTask> respVector_;
 
   void Sleep(int msec);
 
@@ -108,8 +113,9 @@ private:
   QMutex mutex_;
 
 public:
-  void BaiduSEOTest(int spider_num); // baidu.com 刷百度SEO
-  //void BaiduSEOTest(vector<SimulatorTask>& taskVector, int spider_num); // baidu.com 刷百度SEO
+  //void BaiduSEOTest(int spider_num); // baidu.com 刷百度SEO
+  vector<SimulatorTask> BaiduSEOTest(vector<SimulatorTask> reqTaskVector,
+                                     int spider_num); // baidu.com 刷百度SEO
 };
 
 class SeoRankRepotThread : public QThread {

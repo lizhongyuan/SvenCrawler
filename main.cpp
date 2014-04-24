@@ -5,7 +5,12 @@
 #include <QNetworkProxy>
 
 #include <signal.h>
-#include "./manager/csinglecraw.h"
+#include "manager/csinglecraw.h"
+#include "SEOTaskStream/seodownloader.h"
+
+using namespace ganji::crawler::octopus_crawler::downloader;
+
+
 
 void SetCharset() {
   // 设置全局字符编码为UTF-8
@@ -21,6 +26,7 @@ void SigTerm(int x) {
 
 int main(int argc, char *argv[])
 {
+
   QApplication a(argc, argv);
   SetCharset();
   signal(SIGTERM, SigTerm);
@@ -35,7 +41,8 @@ int main(int argc, char *argv[])
 
   if (a.arguments().size() >= 2)
   {
-    spider_num = a.arguments().at(1).toInt();
+    //spider_num = a.arguments().at(1).toInt();
+    spider_num = 1;
   }
    // if argc >= 5, set the proxy's attribute value
   if (a.arguments().size() >= 5)
@@ -56,6 +63,19 @@ int main(int argc, char *argv[])
 
   qDebug() << "Spider Num:" << spider_num;
 
+  QSettings* seoSetting = new QSettings("D:\\crawler_bot_conf.ini",  QSettings::IniFormat);
+
+  SEOdownloader seoDownloader;
+
+
+
+  seoDownloader.Init(seoSetting);
+  seoDownloader.Run();
+
+
+
+
+  /*
   // crawler begin
   CSingleCraw singlecraw;
   if (spider_num <= 0 || spider_num >= 100)
@@ -67,6 +87,7 @@ int main(int argc, char *argv[])
   {
     singlecraw.Start(spider_num);
   }
+  */
 
   return a.exec();
 }

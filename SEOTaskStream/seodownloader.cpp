@@ -162,7 +162,9 @@ SEOdownloader::SEOTaskFunc()
   /*
    * SEO's core process
    */
-  vector<SimulatorTask> respTaskVector = this->testSEOprocess(SEOtaskVector);
+  //vector<SimulatorTask> respTaskVector = this->testSEOprocess(SEOtaskVector);
+  this->singlecraw = new CSingleCraw();
+  vector<SimulatorTask> respTaskVector = this->singlecraw->BaiduSEOTest(SEOtaskVector, 1);
 
   for(vector<SimulatorTask>::iterator iter = respTaskVector.begin(); iter != respTaskVector.end(); iter++)
   {
@@ -179,6 +181,7 @@ SEOdownloader::SEOTaskFunc()
 vector<SimulatorTask>
 SEOdownloader::testSEOprocess2(vector<SimulatorTask>& reqTaskVector)
 {
+
   vector<SimulatorTask> respTaskVector;
   return respTaskVector;
 }
@@ -242,7 +245,7 @@ SEOdownloader::UploadTaskFunc()
   */
 
   NodeState curNodeState;
-  curNodeState.node_id = "192.168.38.167";
+  curNodeState.node_id = "lizhongyuan";
   curNodeState.cpu_state = "";
   curNodeState.mem_state = "";
 
@@ -321,7 +324,8 @@ SEOdownloader::GetTaskFunc()
   vector<BotMessage> reqBotMsgVector;
 
   NodeState curNodeState;
-  curNodeState.node_id = "192.168.38.167";
+  //curNodeState.node_id = "192.168.38.167";
+  curNodeState.node_id = "lizhongyuan";
   curNodeState.cpu_state = "";
   curNodeState.mem_state = "";
 
@@ -351,6 +355,7 @@ SEOdownloader::GetTaskFunc()
         octopus_server_conn_.GetBotTask(BotTasktypes::type::KSEOTASK,
                                         reqBotMsgVector,
                                         curNodeState);
+        //std::cout<<"Test, reqBotMsgVector:"<<reqBotMsgVector[0].bot_task_types<<endl;
         octopus_server_conn_.IncrTimes();
         ret = 0;
         break;
@@ -388,9 +393,11 @@ SEOdownloader::GetTaskFunc()
   for (vector<BotMessage>::iterator it_task = reqBotMsgVector.begin();
       it_task != reqBotMsgVector.end(); ++it_task)
   {
+    std::cout<<"bot_task_types:"<<it_task->bot_task_types<<endl;
+    //qDebug()<<it_task->bot_task_types;
     if (it_task->bot_task_types != BotTasktypes::KSEOTASK)
     {
-      continue;
+      //continue;
     }
 
     boost::mutex::scoped_lock lock(download_lock_);

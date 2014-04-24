@@ -14,15 +14,17 @@
 using namespace std;
 
 CSingleCraw::CSingleCraw(QObject *parent) : QObject(parent) {
-  connect(&(this->timer_), SIGNAL(timeout()), this, SLOT(QuitEventLoop()));
-  connect(&(this->http_get_task_timer_), SIGNAL(timeout()), this, SLOT(HttpGetSeoTask()));
+  //connect(&(this->timer_), SIGNAL(timeout()), this, SLOT(QuitEventLoop()));
+  //connect(&(this->http_get_task_timer_), SIGNAL(timeout()), this, SLOT(HttpGetSeoTask()));
+  connect(&(this->timer_), SIGNAL(timeout()), this, SLOT(QuitEventLoop()), Qt::QueuedConnection);
+  connect(&(this->http_get_task_timer_), SIGNAL(timeout()), this, SLOT(HttpGetSeoTask()), Qt::QueuedConnection);
   this->HttpGetSeoTask();
   this->http_get_task_timer_.start(60000);
 }
 
-void CSingleCraw::Start(int spider_num)
+void CSingleCraw::Start(vector<SimulatorTask> reqTaskVector, int spider_num)
 {
-  this->BaiduSEOTest(spider_num);
+  this->BaiduSEOTest(reqTaskVector, spider_num);
 }
 
 /*
@@ -64,6 +66,7 @@ CSingleCraw::HttpGetSeoTask()
 void
 CSingleCraw::ThriftGetSeoTask(vector<SimulatorTask> SEOTaskVector)
 {
+  /*
   qDebug() << "HttpGetSeoTask";
 
   // put the SEOTaskVector into class' vector
@@ -72,7 +75,10 @@ CSingleCraw::ThriftGetSeoTask(vector<SimulatorTask> SEOTaskVector)
   {
       this->SEOTaskVector_.push_back(*iter);
   }
+
+  this->SEOTaskVector_.clear();
   this->mutex_.unlock();
+  */
 }
 
 /*
@@ -134,19 +140,23 @@ CSingleCraw::getTaskWordList(QStringList&  key_words_lines,
 }
 
 QList<KeyWordItem>
-CSingleCraw::getTaskWordList(bool& is_read_done)
+CSingleCraw::getTaskWordList(vector<SimulatorTask> reqTaskVector,
+                             vector<SimulatorTask>& respTaskVector,
+                             bool& is_read_done)
 {
-    double day_week_rate[10] = {0, 0.16, 0.155, 0.152, 0.151, 0.15, 0.135, 0.133};
-    int day_of_week = QDateTime::currentDateTime().date().dayOfWeek();
-    qDebug() << "Today is:" << day_of_week << "Rate:" << day_week_rate[day_of_week];
-
     QList<KeyWordItem> keyWordItemList;
 
-    for (vector<SimulatorTask>::iterator iter = this->SEOTaskVector_.begin();
-         iter != this->SEOTaskVector_.end(); iter++)
+    if(reqTaskVector.size() != 0)
+    {
+        is_read_done = true;
+    }
+
+    for (vector<SimulatorTask>::iterator iter = reqTaskVector.begin();
+         iter != reqTaskVector.end(); iter++)
     {
 
       KeyWordItem kwi;
+      SimulatorTask curRespTask;
 
       kwi.task_id = QString::number(iter->req_item.task_id);
       kwi.click_count = iter->req_item.click_count;
@@ -154,14 +164,35 @@ CSingleCraw::getTaskWordList(bool& is_read_done)
       kwi.key_words = QString::fromStdString(iter->req_item.key_words);
       kwi.url_regex = QString::fromStdString(iter->req_item.url_regex);
 
+      curRespTask.resp_item.task_id = iter->req_item.task_id;
+      curRespTask.resp_item.target_url = iter->req_item.url_regex;
+      curRespTask.resp_item.cookie = "";
+      curRespTask.resp_item.node_id = 1;
+
+
+      curRespTask.resp_item.time_stamp = this->getCurTime().toStdString();
+
+      respTaskVector.push_back(curRespTask);
+
       for (int i = 0; i < kwi.click_count; i++)
       {
         keyWordItemList.append(kwi);
       }
-
-      //}
     }
     return keyWordItemList;
+}
+
+QString
+CSingleCraw::getCurTime()
+{
+    QDateTime dt;
+    QTime time;
+    QDate date;
+    dt.setTime(time.currentTime());
+    dt.setDate(date.currentDate());
+    QString currentDate = dt.toString("yyyy-MM-dd hh:mm:ss");
+
+    return currentDate;
 }
 
 /*
@@ -623,54 +654,46 @@ CSingleCraw::keyWordProcess(QList<KeyWordItem>& word_list,
  * changed by lizhongyuan,
  * the function
  */
-void CSingleCraw::BaiduSEOTest(int spider_num)
+//void
+vector<SimulatorTask>
+CSingleCraw::BaiduSEOTest(vector<SimulatorTask> reqTaskVector,
+                          int spider_num)
 {
-  //CPageLoader *pageloader = NULL;
+  //vector<
+  /*
+  for(vector<SimulatorTask>::iterator iter = reqTaskVector.begin(); iter != reqTaskVector.end(); iter++)
+  {
+      this->SEOTaskVector_.push_back(*iter);
+  }
+  */
+  vector<SimulatorTask> respTaskVector;
+
   while (true)
   {
-    /*
-    this->mutex_.lock();
-    QString key_words_data = this->seo_task_list_;
-    this->mutex_.unlock();
-    */
-
-    /*
-    if (key_words_data.trimmed() == "###done###")
+    if (reqTaskVector.empty())
     {
       qDebug() << "No task right now. sleep 70s";
       this->Sleep(70000);
       continue;
     }
-    */
-    if (this->SEOTaskVector_.empty())
-    {
-      qDebug() << "No task right now. sleep 70s";
-      this->Sleep(70000);
-      continue;
-    }
-
-    //QStringList key_words_lines = key_words_data.split("\n");
 
     bool is_read_done = false;
 
     /*
-     * build the word_list
+     * build the keyWordItemList
      */
 
-    /*
-    QList<KeyWordItem> word_list = this->getTaskWordList(key_words_lines,
+    QList<KeyWordItem> keyWordItemList = this->getTaskWordList(reqTaskVector,
+                                                         respTaskVector,
                                                          is_read_done);
-    */
 
-    QList<KeyWordItem> word_list = this->getTaskWordList(is_read_done);
-
-    qDebug() << "word_list count():" << word_list.count();
+    qDebug() << "keyWordItemList count():" << keyWordItemList.count();
     if (is_read_done == false) {
       qDebug() << "Could not finish reading key word list.";
       this->Sleep(3000);
       continue;
     }
-    if (word_list.count() == 0) {
+    if (keyWordItemList.count() == 0) {
       qDebug() << "Empty key word list.";
       this->Sleep(3000);
       continue;
@@ -684,7 +707,7 @@ void CSingleCraw::BaiduSEOTest(int spider_num)
       continue;
     }
 
-    this->keyWordProcess(word_list,
+    this->keyWordProcess(keyWordItemList,
                          pageloader,
                          spider_num);
 
@@ -692,6 +715,8 @@ void CSingleCraw::BaiduSEOTest(int spider_num)
     pageloader = NULL;
     // need delete the pageloader
   }
+
+  return respTaskVector;
 }
 
 
