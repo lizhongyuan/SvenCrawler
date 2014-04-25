@@ -182,6 +182,50 @@ CSingleCraw::getTaskWordList(vector<SimulatorTask> reqTaskVector,
     return keyWordItemList;
 }
 
+QList<KeyWordItem>
+CSingleCraw::getTaskWordList(vector<BotMessage> reqTaskVector,
+                             vector<BotMessage>& respTaskVector,
+                             bool& is_read_done)
+{
+    QList<KeyWordItem> keyWordItemList;
+
+    if(reqTaskVector.size() != 0)
+    {
+        is_read_done = true;
+    }
+
+    for (vector<BotMessage>::iterator iter = reqTaskVector.begin();
+         iter != reqTaskVector.end(); iter++)
+    {
+
+      KeyWordItem kwi;
+      //SimulatorTask curRespTask;
+      BotMessage curRespTask;
+
+      kwi.task_id = QString::number(iter->simulator_task.req_item.task_id);
+      kwi.click_count = iter->simulator_task.req_item.click_count;
+      kwi.city = QString::fromStdString(iter->simulator_task.req_item.city);
+      kwi.key_words = QString::fromStdString(iter->simulator_task.req_item.key_words);
+      kwi.url_regex = QString::fromStdString(iter->simulator_task.req_item.url_regex);
+
+      curRespTask.simulator_task.resp_item.task_id = iter->req_item.task_id;
+      curRespTask.simulator_task.resp_item.target_url = iter->req_item.url_regex;
+      curRespTask.simulator_task.resp_item.cookie = "";
+      curRespTask.simulator_task.resp_item.node_id = 1;
+
+
+      curRespTask.simulator_task.resp_item.time_stamp = this->getCurTime().toStdString();
+
+      respTaskVector.push_back(curRespTask);
+
+      for (int i = 0; i < kwi.click_count; i++)
+      {
+        keyWordItemList.append(kwi);
+      }
+    }
+    return keyWordItemList;
+}
+
 QString
 CSingleCraw::getCurTime()
 {
@@ -717,6 +761,64 @@ CSingleCraw::BaiduSEOTest(vector<SimulatorTask> reqTaskVector,
   }
 
   return respTaskVector;
+}
+
+vector<BotMessage>
+CSingleCraw::BaiduSEOTest(vector<BotMessage> reqTaskVector,
+                          int spider_num) // baidu.com 刷百度SE
+{
+    //vector<SimulatorTask> respTaskVector;
+    vector<BotMessage> respTaskVector;
+
+    while (true)
+    {
+      if (reqTaskVector.empty())
+      {
+        qDebug() << "No task right now. sleep 70s";
+        this->Sleep(70000);
+        continue;
+      }
+
+      bool is_read_done = false;
+
+      /*
+       * build the keyWordItemList
+       */
+
+      QList<KeyWordItem> keyWordItemList = this->getTaskWordList(reqTaskVector,
+                                                                 respTaskVector,
+                                                                 is_read_done);
+
+      qDebug() << "keyWordItemList count():" << keyWordItemList.count();
+      if (is_read_done == false) {
+        qDebug() << "Could not finish reading key word list.";
+        this->Sleep(3000);
+        continue;
+      }
+      if (keyWordItemList.count() == 0) {
+        qDebug() << "Empty key word list.";
+        this->Sleep(3000);
+        continue;
+      }
+
+      // get a pageloader
+      // this->resetPageloader(pageloader);
+      CPageLoader* pageloader = CSingleCraw::pageLoaderFactory();
+      if(pageloader == NULL)
+      {
+        continue;
+      }
+
+      this->keyWordProcess(keyWordItemList,
+                           pageloader,
+                           spider_num);
+
+      delete pageloader;
+      pageloader = NULL;
+      // need delete the pageloader
+    }
+
+    return respTaskVector;
 }
 
 

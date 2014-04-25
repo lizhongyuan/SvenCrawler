@@ -25,9 +25,6 @@ class GetBotMsgThread : public QThread
 {
     Q_OBJECT
 public:
-    //net::BotMessageHandler  octopus_server_conn_;  ///< 与bot server的连接
-    //QSettings*  confSettingPtr;
-    //explicit getBotMsgThread(QObject *parent = 0);
     GetBotMsgThread(net::BotMessageHandler* octopusServerConnPtr,
                     QSettings*              confSettingPtr,
                     vector<BotMessage>      reqTaskVector,

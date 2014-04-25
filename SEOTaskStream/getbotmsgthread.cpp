@@ -95,7 +95,7 @@ GetBotMsgThread::getBotMsgTask()
 {
     this->getMutex_.lock();
 
-    while(100 == this->download_queue_.size())
+    while(1000 == this->download_queue_.size())
     {
         this->ioMutex_.lock();
         qDebug()<<"The download queue is full enough, wait for popping";
@@ -111,6 +111,12 @@ GetBotMsgThread::getBotMsgTask()
     {
         this->getMutex_.lock();
 
+        if(this->download_queue_.size() == 1000)
+        {
+            this->getMutex_.unlock();
+            break;
+        }
+
         // log
 
         this->download_queue_.push(*iter);
@@ -118,8 +124,10 @@ GetBotMsgThread::getBotMsgTask()
         boost::this_thread::sleep(boost::posix_time::milliseconds(9));
 
         this->getMutex_.unlock();
-        this->download_cond_.wakeAll();
+        //this->download_cond_.wakeAll();
     }
+
+    this->download_cond_.wakeAll();   // tell the SEOworkThread
 
     this->reqTaskVector_.clear();
 
