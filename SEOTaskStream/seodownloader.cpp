@@ -14,6 +14,9 @@ using namespace std;
 
 namespace ganji { namespace crawler { namespace octopus_crawler { namespace downloader {
 
+using namespace net;
+
+/*
 void*
 SEOdownloader::GetTaskThread(void *arg)
 {
@@ -31,9 +34,7 @@ SEOdownloader::GetTaskThread(void *arg)
       //boost::this_thread::sleep(boost::posix_time::milliseconds(time_slice));
       boost::this_thread::sleep(boost::posix_time::seconds(time_slice));
 
-      /*
-       *  let's make a test, qDebug() sth .
-       */
+      //  let's make a test, qDebug() sth .
       p_seodownloader->GetTaskFunc();
       //qDebug()<<i++;
     }
@@ -81,11 +82,12 @@ SEOdownloader::UploadTaskThread(void *arg)
     }
     return NULL;
 }
+*/
 
 int
 SEOdownloader::Init(QSettings* confSettingPtr)
 {
-  this->confSettingPtr = confSettingPtr;
+  this->confSettingPtr_ = confSettingPtr;
   if(!confSettingPtr)
   {
       return -1;
@@ -94,23 +96,27 @@ SEOdownloader::Init(QSettings* confSettingPtr)
   /*
    * get the configure's value
    */
-  QString dcHost = this->confSettingPtr->value("downloader/OCTOPUS_SERVER_HOST").toString();
-  int dcPort = this->confSettingPtr->value("downloader/OCTOPUS_SERVER_PORT").toInt();
-  int socketTimeout = this->confSettingPtr->value("downloader/SOCKET_TIMEOUT").toInt();
-  int persistCount = this->confSettingPtr->value("downloader/PERSIST_COUNT").toInt();
+  QString dcHost = this->confSettingPtr_->value("downloader/OCTOPUS_SERVER_HOST").toString();
+  int dcPort = this->confSettingPtr_->value("downloader/OCTOPUS_SERVER_PORT").toInt();
+  int socketTimeout = this->confSettingPtr_->value("downloader/SOCKET_TIMEOUT").toInt();
+  int persistCount = this->confSettingPtr_->value("downloader/PERSIST_COUNT").toInt();
 
   {
-    boost::mutex::scoped_lock io_mutex(this->io_lock_);
+    //boost::mutex::scoped_lock io_mutex(this->io_lock_);
+    this->ioMutex_.lock();
     qDebug()<<dcHost;
     qDebug()<<dcPort;
     qDebug()<<socketTimeout;
     qDebug()<<persistCount;
+    this->ioMutex_.unlock();
   }
 
-  this->octopus_server_conn_.Init(dcHost.toStdString(),
-                                  dcPort,
-                                  socketTimeout,
-                                  persistCount);
+  this->octopusServerConnPtr_ = new net::BotMessageHandler();
+
+  this->octopusServerConnPtr_->Init(dcHost.toStdString(),
+                                    dcPort,
+                                    socketTimeout,
+                                    persistCount);
 
 
 
@@ -120,15 +126,24 @@ SEOdownloader::Init(QSettings* confSettingPtr)
 void
 SEOdownloader::Run()
 {
+  /*
   this->getBotTaskThread_ = boost::thread(boost::bind(GetTaskThread, this));
   this->popThread_ = boost::thread(boost::bind(SEOTaskThread, this));
   this->uploadThread_ = boost::thread(boost::bind(UploadTaskThread, this));
+  */
+  this->getBotMsgThread_ = new GetBotMsgThread(this->octopusServerConnPtr_,
+                                               this->confSettingPtr_,
+                                               this->reqTaskVector_,
+                                               this->download_queue_,
+                                               this->download_cond_);
+  this->getBotMsgThread_->start();
 }
 
 
 /*
  *  upload the task
  */
+/*
 int
 SEOdownloader::SEOTaskFunc()
 {
@@ -159,9 +174,7 @@ SEOdownloader::SEOTaskFunc()
       this->download_cond_.notify_all();  //notify the download_queue
   }
 
-  /*
    * SEO's core process
-   */
   //vector<SimulatorTask> respTaskVector = this->testSEOprocess(SEOtaskVector);
   this->singlecraw = new CSingleCraw();
   vector<SimulatorTask> respTaskVector = this->singlecraw->BaiduSEOTest(SEOtaskVector, 1);
@@ -244,14 +257,18 @@ SEOdownloader::UploadTaskFunc()
   uploadQueue.push_back(curBotMessage);
   */
 
+  /*
   NodeState curNodeState;
   curNodeState.node_id = "lizhongyuan";
   curNodeState.cpu_state = "";
   curNodeState.mem_state = "";
+  */
 
   /*
    * connect, and upload the Simulate Task Queue
    */
+
+/*
   do
   {
     //  There is a reclock before
@@ -331,9 +348,7 @@ SEOdownloader::GetTaskFunc()
 
   do
   {
-    /*
-     *  There is a reclock before
-     */
+    //  There is a reclock before
     boost::mutex::scoped_lock lock(this->download_lock_);
     if (octopus_server_conn_.NeedReset())
     {
@@ -344,10 +359,8 @@ SEOdownloader::GetTaskFunc()
       }
     }
 
-    /*
-     * retry until success
-     * indeed, it only succeed once
-     */
+    // retry until success
+    // indeed, it only succeed once
     for (int i = 0; i < this->confSettingPtr->value("downloader/RETRY_TIMES").toInt() ; i++)
     {
       try
@@ -407,5 +420,6 @@ SEOdownloader::GetTaskFunc()
   }
   return 0;
 } // end
+*/
 
 }}}};

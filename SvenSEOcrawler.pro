@@ -35,7 +35,10 @@ SOURCES += main.cpp \
     gen-cpp/OctopusProxyService.cpp \
     SEOTaskStream/seodownloader.cpp \
     thrift/protocol/TBinaryProtocol.tcc \
-    manager/csinglecraw.cpp
+    manager/csinglecraw.cpp \
+    SEOTaskStream/seoworkthread.cpp \
+    SEOTaskStream/uploadbotmsgthread.cpp \
+    SEOTaskStream/getbotmsgthread.cpp
 
 OTHER_FILES += \
     conf/user_agent.txt \
@@ -126,7 +129,10 @@ HEADERS += \
     gen-cpp/OctopusProxyService.h \
     SEOTaskStream/seodownloader.h \
     manager/csinglecraw.h \
-    manager/KeyWordItem.h
+    manager/KeyWordItem.h \
+    SEOTaskStream/seoworkthread.h \
+    SEOTaskStream/uploadbotmsgthread.h \
+    SEOTaskStream/getbotmsgthread.h
 
 LIBS += -L$$PWD/../../../software/boost_1_49_0/bin/vc10/lib/ -llibboost_thread-vc100-mt-gd-1_49
 

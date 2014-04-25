@@ -15,9 +15,12 @@
 #include <list>
 #include <QMutex>
 
-#include "bot_client.h"
-
+//#include "bot_client.h"
 #include "manager/csinglecraw.h"
+
+#include "getbotmsgthread.h"
+#include "seoworkthread.h"
+#include "uploadbotmsgthread.h"
 
 
 namespace ganji { namespace crawler { namespace octopus_crawler { namespace downloader {
@@ -58,15 +61,16 @@ class SEOdownloader
 public:
   SEOdownloader()
   {
-    this->confSettingPtr = NULL;
+    this->confSettingPtr_ = NULL;
+    this->octopusServerConnPtr_ = NULL;
   }
 
   ~SEOdownloader()
   {
-      if(this->confSettingPtr != NULL)
+      if(this->confSettingPtr_ != NULL)
       {
-          delete this->confSettingPtr;
-          this->confSettingPtr = NULL;
+          delete this->confSettingPtr_;
+          this->confSettingPtr_ = NULL;
       }
   }
 
@@ -84,37 +88,33 @@ public:
   int SEOTaskFunc();
   */
 
-  static void* GetTaskThread(void *arg);
-  int GetTaskFunc();
-  static void* UploadTaskThread(void* arg);
-  int UploadTaskFunc();
-  static void* SEOTaskThread(void *arg);
-  int SEOTaskFunc();
-
-
+  /*
   vector<SimulatorTask> testSEOprocess(vector<SimulatorTask>& reqTask);
   vector<SimulatorTask> testSEOprocess2(vector<SimulatorTask>& reqTask);
+  */
 
 private:
-  net::BotMessageHandler  octopus_server_conn_;  ///< 与bot server的连接
-  QSettings*  confSettingPtr;
+  //net::BotMessageHandler  octopus_server_conn_;  ///< 与bot server的连接
+  net::BotMessageHandler*  octopusServerConnPtr_;
+  QSettings*  confSettingPtr_;
 
-  boost::condition_variable download_cond_;
-  boost::condition_variable upload_cond_;
+  vector<BotMessage> reqTaskVector_;
+  vector<BotMessage> respTaskVector_;
 
-  queue<SimulatorTask> upload_queue_;
-  queue<SimulatorTask> download_queue_;
+  queue<BotMessage>   download_queue_;
+  queue<BotMessage>   upload_queue;
 
-  boost::thread getBotTaskThread_;
-  boost::thread popThread_;
-  boost::thread uploadThread_;
+  GetBotMsgThread*    getBotMsgThread_;
+  SEOWorkThread*      seoWorkThread_;
+  UploadBotMsgThread* uploadBotMsgThread_;
 
-  boost::mutex io_lock_;
-  mutable boost::mutex download_lock_;
-  mutable boost::mutex SEOtask_lock_;
-  mutable boost::mutex upload_lock_;
+  QWaitCondition  download_cond_;
+  QWaitCondition  upload_cond_;
 
-  CSingleCraw* singlecraw;
+  QMutex  ioMutex_;
+
+
+  CSingleCraw* singlecraw_;
 };
 
 

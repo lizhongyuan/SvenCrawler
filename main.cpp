@@ -28,6 +28,7 @@ int main(int argc, char *argv[])
 {
 
   QApplication a(argc, argv);
+  /*
   SetCharset();
   signal(SIGTERM, SigTerm);
   signal(SIGINT,  SigTerm);
@@ -63,17 +64,14 @@ int main(int argc, char *argv[])
 
   qDebug() << "Spider Num:" << spider_num;
 
+  */
+
   QSettings* seoSetting = new QSettings("D:\\crawler_bot_conf.ini",  QSettings::IniFormat);
 
   SEOdownloader seoDownloader;
 
-
-
   seoDownloader.Init(seoSetting);
   seoDownloader.Run();
-
-
-
 
   /*
   // crawler begin
