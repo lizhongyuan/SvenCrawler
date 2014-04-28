@@ -25,7 +25,8 @@ CSingleCraw::CSingleCraw(QObject *parent) : QObject(parent) {
   this->http_get_task_timer_.start(60000);
 }
 
-void CSingleCraw::Start(vector<SimulatorTask> reqTaskVector, int spider_num)
+//void CSingleCraw::Start(vector<SimulatorTask> reqTaskVector, int spider_num)
+void CSingleCraw::Start(vector<BotMessage> reqTaskVector, int spider_num)
 {
   this->BaiduSEOTest(reqTaskVector, spider_num);
 }
@@ -142,6 +143,7 @@ CSingleCraw::getTaskWordList(QStringList&  key_words_lines,
     return word_list;
 }
 
+/*
 QList<KeyWordItem>
 CSingleCraw::getTaskWordList(vector<SimulatorTask> reqTaskVector,
                              vector<SimulatorTask>& respTaskVector,
@@ -184,6 +186,9 @@ CSingleCraw::getTaskWordList(vector<SimulatorTask> reqTaskVector,
     }
     return keyWordItemList;
 }
+*/
+
+
 
 QList<KeyWordItem>
 CSingleCraw::getTaskWordList(vector<BotMessage> reqTaskVector,
@@ -228,6 +233,7 @@ CSingleCraw::getTaskWordList(vector<BotMessage> reqTaskVector,
     }
     return keyWordItemList;
 }
+
 
 QString
 CSingleCraw::getCurTime()
@@ -639,11 +645,14 @@ CSingleCraw::keyWordProcess(QList<KeyWordItem>& word_list,
 
     // 百度首页 输入第一个关键词
     QWebElement dom = pageloader->GetWebElement();
+    /*
     if (dom.toPlainText().indexOf("使用百度前必读") == -1) {
       qDebug() << "Can not open www.baidu.com";
       this->Sleep(3000);
       continue;
     }
+    */
+
     QWebElement input = dom.findFirst("input#kw1");
     if (input.geometry().width() < 200 || input.geometry().height() < 10) {
       qDebug() << "Fatal Error: Strange kw input.";
@@ -702,17 +711,16 @@ CSingleCraw::keyWordProcess(QList<KeyWordItem>& word_list,
  * the function
  */
 //void
+/*
 vector<SimulatorTask>
 CSingleCraw::BaiduSEOTest(vector<SimulatorTask> reqTaskVector,
                           int spider_num)
 {
   //vector<
-  /*
   for(vector<SimulatorTask>::iterator iter = reqTaskVector.begin(); iter != reqTaskVector.end(); iter++)
   {
       this->SEOTaskVector_.push_back(*iter);
   }
-  */
   vector<SimulatorTask> respTaskVector;
 
   while (true)
@@ -726,9 +734,7 @@ CSingleCraw::BaiduSEOTest(vector<SimulatorTask> reqTaskVector,
 
     bool is_read_done = false;
 
-    /*
-     * build the keyWordItemList
-     */
+    // build the keyWordItemList
 
     QList<KeyWordItem> keyWordItemList = this->getTaskWordList(reqTaskVector,
                                                          respTaskVector,
@@ -765,6 +771,7 @@ CSingleCraw::BaiduSEOTest(vector<SimulatorTask> reqTaskVector,
 
   return respTaskVector;
 }
+*/
 
 vector<BotMessage>
 CSingleCraw::BaiduSEOTest(vector<BotMessage> reqTaskVector,

@@ -32,9 +32,11 @@ public:
   QList<KeyWordItem> getTaskWordList(QStringList&  key_word_lines,
                                      bool&         is_read_done);
 
+  /*
   QList<KeyWordItem> getTaskWordList(vector<SimulatorTask> reqTaskVector,
                                      vector<SimulatorTask>& respTaskVector,
                                      bool& is_read_done);
+  */
 
   QList<KeyWordItem> getTaskWordList(vector<BotMessage> reqTaskVector,
                                      vector<BotMessage>& respTaskVector,
@@ -92,9 +94,8 @@ public:
 
   QString getCurTime();
 
-  void Start(vector<SimulatorTask> reqTaskVector, int spider_num);
+  //void Start(vector<SimulatorTask> reqTaskVector, int spider_num);
   void Start(vector<BotMessage> reqTaskVector, int spider_num);
-  //void Start(vector<SimulatorTask>& taskVector, int spider_num);
 
   QEventLoop eventloop_;
   QTimer timer_;
@@ -120,8 +121,10 @@ private:
 
 public:
   //void BaiduSEOTest(int spider_num); // baidu.com 刷百度SEO
+  /*
   vector<SimulatorTask> BaiduSEOTest(vector<SimulatorTask> reqTaskVector,
                                      int spider_num); // baidu.com 刷百度SEO
+                                     */
   vector<BotMessage> BaiduSEOTest(vector<BotMessage> reqTaskVector,
                                      int spider_num); // baidu.com 刷百度SEO
 };

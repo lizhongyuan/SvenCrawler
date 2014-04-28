@@ -144,7 +144,8 @@ SEOdownloader::Run()
                                             this->upload_queue_,
                                             this->download_cond_,
                                             this->download_cond_);
-    this->seoWorkThread_->start();
+    //this->seoWorkThread_->start();
+    this->seoWorkThread_->run();
 }
 
 
