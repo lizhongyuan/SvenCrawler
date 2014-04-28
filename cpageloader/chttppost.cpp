@@ -1,8 +1,4 @@
-﻿//#include "bot_client.h"
-#include "SEOTaskStream/bot_client.h"
-
-//#include "page_loader/chttppost.h"
-#include "cpageloader/chttppost.h"
+﻿#include "cpageloader/chttppost.h"
 
 CHttpPost::CHttpPost(QObject *parent) : QObject(parent) {
   connect(&m_manager, SIGNAL(finished(QNetworkReply*)),

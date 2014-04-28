@@ -7,6 +7,9 @@
 #include <QSqlError>
 #include <QDebug>
 #include <QTest>
+
+#include <gen-cpp/octopus_crawler_types.h>
+
 #include "./conf/csqlhelper.h"
 
 #include"stdlib.h"
@@ -208,8 +211,8 @@ CSingleCraw::getTaskWordList(vector<BotMessage> reqTaskVector,
       kwi.key_words = QString::fromStdString(iter->simulator_task.req_item.key_words);
       kwi.url_regex = QString::fromStdString(iter->simulator_task.req_item.url_regex);
 
-      curRespTask.simulator_task.resp_item.task_id = iter->req_item.task_id;
-      curRespTask.simulator_task.resp_item.target_url = iter->req_item.url_regex;
+      curRespTask.simulator_task.resp_item.task_id = iter->simulator_task.req_item.task_id;
+      curRespTask.simulator_task.resp_item.target_url = iter->simulator_task.req_item.url_regex;
       curRespTask.simulator_task.resp_item.cookie = "";
       curRespTask.simulator_task.resp_item.node_id = 1;
 

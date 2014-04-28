@@ -40,10 +40,6 @@
 
 #include<QMutex>
 
-//#include"bot_client.h"
-
-
-
 namespace net {
 
 using std::string;

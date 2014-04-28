@@ -18,6 +18,7 @@
 
 #include "KeyWordItem.h"
 #include "cpageloader/cpageloader.h"
+//#include "SEOTaskStream/bot_client.h"
 #include "gen-cpp/octopus_crawler_types.h"
 
 using namespace std;

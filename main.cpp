@@ -10,8 +10,6 @@
 
 using namespace ganji::crawler::octopus_crawler::downloader;
 
-
-
 void SetCharset() {
   // 设置全局字符编码为UTF-8
   QTextCodec *codec = QTextCodec::codecForName("UTF-8");

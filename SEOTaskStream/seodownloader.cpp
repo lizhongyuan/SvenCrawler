@@ -1,9 +1,8 @@
 ﻿#include "seodownloader.h"
 
-#include"boost/thread.hpp"
+
 
 #include<stdlib.h>
-
 #include<iostream>
 #include<list>
 #include<vector>
@@ -126,17 +125,26 @@ SEOdownloader::Init(QSettings* confSettingPtr)
 void
 SEOdownloader::Run()
 {
-  /*
-  this->getBotTaskThread_ = boost::thread(boost::bind(GetTaskThread, this));
-  this->popThread_ = boost::thread(boost::bind(SEOTaskThread, this));
-  this->uploadThread_ = boost::thread(boost::bind(UploadTaskThread, this));
-  */
-  this->getBotMsgThread_ = new GetBotMsgThread(this->octopusServerConnPtr_,
-                                               this->confSettingPtr_,
-                                               this->reqTaskVector_,
-                                               this->download_queue_,
-                                               this->download_cond_);
-  this->getBotMsgThread_->start();
+    /*
+    this->getBotTaskThread_ = boost::thread(boost::bind(GetTaskThread, this));
+    this->popThread_ = boost::thread(boost::bind(SEOTaskThread, this));
+    this->uploadThread_ = boost::thread(boost::bind(UploadTaskThread, this));
+    */
+
+    this->getBotMsgThread_ = new GetBotMsgThread(this->octopusServerConnPtr_,
+                                                 this->confSettingPtr_,
+                                                 this->reqTaskVector_,
+                                                 this->download_queue_,
+                                                 this->download_cond_);
+    this->getBotMsgThread_->start();
+
+    this->seoWorkThread_ = new SEOWorkThread(this->octopusServerConnPtr_,
+                                             this->confSettingPtr_,
+                                            this->download_queue_,
+                                            this->upload_queue_,
+                                            this->download_cond_,
+                                            this->download_cond_);
+    this->seoWorkThread_->start();
 }
 
 

@@ -7,25 +7,29 @@
 #include <QtDebug>
 #include <vector>
 #include <queue>
-#include"gen-cpp/octopus_crawler_types.h"
-#include"gen-cpp/OctopusProxyService.h"
+//#include"gen-cpp/octopus_crawler_types.h"
+//#include"gen-cpp/OctopusProxyService.h"
 #include"gen-cpp/octopus_crawler_constants.h"
-#include"bot_client.h"
 #include<QWaitCondition>
 #include"QSettings"
-
 #include"boost/thread.hpp"
 
+#include"bot_client.h"
+
+
 namespace ganji { namespace crawler { namespace octopus_crawler { namespace downloader {
-using namespace net;
+//using namespace net;
 using namespace std;
+
+//class net::BotMessageHandler;
 
 
 class GetBotMsgThread : public QThread
 {
     Q_OBJECT
 public:
-    GetBotMsgThread(net::BotMessageHandler* octopusServerConnPtr,
+    GetBotMsgThread(
+                    net::BotMessageHandler* octopusServerConnPtr,
                     QSettings*              confSettingPtr,
                     vector<BotMessage>      reqTaskVector,
                     queue<BotMessage>&      download_queue,
@@ -36,11 +40,11 @@ public:
     }
 
     int
-    ResetConnect();
+    getTask();
 
     void run();
 
-    void getBotMsgTask();
+    void moveToQueue();
 
 signals:
 

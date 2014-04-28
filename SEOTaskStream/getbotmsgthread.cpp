@@ -3,25 +3,18 @@
 
 namespace ganji { namespace crawler { namespace octopus_crawler { namespace downloader {
 
-/*
-GetBotMsgThread::GetBotMsgThread(QObject *parent) :
-    QThread(parent)
-{
-}
-*/
-
 void
 GetBotMsgThread::run()
 {
     while(true)
     {
-        this->ResetConnect();
-        this->getBotMsgTask();
+        this->getTask();
+        this->moveToQueue();
     }
 }
 
 int
-GetBotMsgThread::ResetConnect()
+GetBotMsgThread::getTask()
 {
     int ret = -2;
 
@@ -30,10 +23,10 @@ GetBotMsgThread::ResetConnect()
     curNodeState.cpu_state = "";
     curNodeState.mem_state = "";
 
+    this->getMutex_.lock();
     do
     {
-      //boost::mutex::scoped_lock lock(this->download_lock_);
-      this->getMutex_.lock();
+      //this->getMutex_.lock();
       if (this->octopusServerConnPtr_->NeedReset())
       {
         bool is_ok = this->octopusServerConnPtr_->Reset();
@@ -48,9 +41,8 @@ GetBotMsgThread::ResetConnect()
         try
         {
           this->octopusServerConnPtr_->GetBotTask(BotTasktypes::type::KSEOTASK,
-                                          this->reqTaskVector_,
-                                          curNodeState);
-          //std::cout<<"Test, reqBotMsgVector:"<<reqBotMsgVector[0].bot_task_types<<endl;
+                                                  this->reqTaskVector_,
+                                                  curNodeState);
           this->octopusServerConnPtr_->IncrTimes();
           ret = 0;
           break;
@@ -75,8 +67,10 @@ GetBotMsgThread::ResetConnect()
           }
         }
       }
-      this->getMutex_.unlock();
+      //this->getMutex_.unlock();
     } while (0);
+
+    this->getMutex_.unlock();
 
     {
       this->ioMutex_.lock();
@@ -88,10 +82,12 @@ GetBotMsgThread::ResetConnect()
     {
       return 0;
     }
+
+    return ret;
 }
 
 void
-GetBotMsgThread::getBotMsgTask()
+GetBotMsgThread::moveToQueue()
 {
     this->getMutex_.lock();
 
@@ -117,8 +113,6 @@ GetBotMsgThread::getBotMsgTask()
             break;
         }
 
-        // log
-
         this->download_queue_.push(*iter);
 
         boost::this_thread::sleep(boost::posix_time::milliseconds(9));
@@ -128,7 +122,6 @@ GetBotMsgThread::getBotMsgTask()
     }
 
     this->download_cond_.wakeAll();   // tell the SEOworkThread
-
     this->reqTaskVector_.clear();
 
     this->ioMutex_.lock();

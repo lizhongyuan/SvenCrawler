@@ -9,48 +9,30 @@
 #include"gen-cpp/octopus_crawler_constants.h"
 #include"gen-cpp/octopus_crawler_types.h"
 
+#include"boost/thread.hpp"
+
 #include <queue>
 #include <iostream>
 #include <vector>
 #include <list>
 #include <QMutex>
 
-//#include "bot_client.h"
+#include "long_short_conn.h"
 #include "manager/csinglecraw.h"
-
 #include "getbotmsgthread.h"
 #include "seoworkthread.h"
 #include "uploadbotmsgthread.h"
 
 
+
 namespace ganji { namespace crawler { namespace octopus_crawler { namespace downloader {
 
-using namespace net;
+//using namespace net;
 
 
-class BotMessageHandler;
+//class net::BotMessageHandler;
 
 class SEOdownloader;
-
-/*
-struct ThreadArg
-{
-  ThreadArg()
-  {
-    p_seodownloader = NULL;
-    idx = 0;
-  }
-  ThreadArg(SEOdownloader *my_seodownloader, int my_idx)
-  {
-    p_seodownloader = my_seodownloader;
-    idx = my_idx;
-  }
-
-  SEOdownloader *p_seodownloader;
-  int idx;
-};
-*/
-
 
 /**
  * @class SEOdownloader
@@ -94,19 +76,18 @@ public:
   */
 
 private:
-  //net::BotMessageHandler  octopus_server_conn_;  ///< 与bot server的连接
-  net::BotMessageHandler*  octopusServerConnPtr_;
-  QSettings*  confSettingPtr_;
+  net::BotMessageHandler* octopusServerConnPtr_;
+  QSettings*              confSettingPtr_;
 
   vector<BotMessage> reqTaskVector_;
   vector<BotMessage> respTaskVector_;
 
   queue<BotMessage>   download_queue_;
-  queue<BotMessage>   upload_queue;
+  queue<BotMessage>   upload_queue_;
 
   GetBotMsgThread*    getBotMsgThread_;
   SEOWorkThread*      seoWorkThread_;
-  UploadBotMsgThread* uploadBotMsgThread_;
+  //UploadBotMsgThread* uploadBotMsgThread_;
 
   QWaitCondition  download_cond_;
   QWaitCondition  upload_cond_;

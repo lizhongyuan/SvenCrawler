@@ -9,19 +9,23 @@
 #include <QWaitCondition>
 #include <vector>
 #include <queue>
-#include"gen-cpp/octopus_crawler_types.h"
-#include"gen-cpp/OctopusProxyService.h"
+//#include"gen-cpp/octopus_crawler_types.h"
+//#include"gen-cpp/OctopusProxyService.h"
 #include"gen-cpp/octopus_crawler_constants.h"
-#include"bot_client.h"
 #include "manager/csinglecraw.h"
 #include<QWaitCondition>
 #include"QSettings"
-
 #include"boost/thread.hpp"
+
+#include"bot_client.h"
+
 
 namespace ganji { namespace crawler { namespace octopus_crawler { namespace downloader {
 using namespace net;
 using namespace std;
+
+//class net::BotMessageHandler;
+
 
 class SEOWorkThread : public QThread
 {
@@ -34,14 +38,21 @@ public:
                   queue<BotMessage>&      upload_queue,
                   QWaitCondition&         download_cond,
                   QWaitCondition&         upload_cond):
+        octopusServerConnPtr_(octopusServerConnPtr), confSettingPtr_(confSettingPtr),
+        download_queue_(download_queue), upload_queue_(upload_queue),
+        download_cond_(download_cond), upload_cond_(upload_cond)
     {
+        this->csingleCraw = new CSingleCraw();
     }
+
+    ~SEOWorkThread();
 
     void run();
 
-    void SEOprocess();
+    vector<BotMessage>  outOffQueue();
+    vector<BotMessage>  SEOprocess(vector<BotMessage> reqTaskVector);
 
-    void init();
+    void sendTask(vector<BotMessage> respTaskVector);
 
 signals:
 
@@ -49,6 +60,7 @@ public slots:
 
 private:
     net::BotMessageHandler* octopusServerConnPtr_;
+    //BotMessageHandler* octopusServerConnPtr_;
     QSettings*              confSettingPtr_;
     queue<BotMessage>&      download_queue_;
     queue<BotMessage>&      upload_queue_;

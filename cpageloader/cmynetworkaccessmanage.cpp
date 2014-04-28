@@ -1,5 +1,4 @@
 ﻿#include "cpageloader/cmynetworkaccessmanage.h"
-//#include "./conf/cconf.h"
 
 CMyNetworkAccessManager::CMyNetworkAccessManager()
 {

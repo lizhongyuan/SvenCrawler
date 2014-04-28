@@ -1,5 +1,6 @@
 ﻿#include "cmywebpage.h"
-#include "../conf/cconf.h"
+//#include "../conf/cconf.h"
+#include"conf/cconf.h"
 //#include"E:/workspaces/qt_workspace/SEOcrawler/conf/cconf.h"
 #include<QtDebug>
 

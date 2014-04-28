@@ -14,7 +14,6 @@
  *
  */
 #include"bot_client.h"
-//#include "./bot_client.h"
 
 namespace net
 {

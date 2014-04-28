@@ -14,6 +14,8 @@
 #ifndef _GANJI_CRAWLER_OCTOPUS_CRAWLER_BOT_CLIENT_H_
 #define _GANJI_CRAWLER_OCTOPUS_CRAWLER_BOT_CLINET_H_
 
+#pragma once
+
 
 #include "long_short_conn.h"
 #include "gen-cpp/octopus_crawler_types.h"
@@ -35,7 +37,6 @@
 #include <queue>
 #include <deque>
 
-//using namespace ganji::crawler::octopus_crawler::downloader;
 namespace net
 {
 
@@ -51,15 +52,7 @@ using namespace ::apache::thrift::transport;
 using namespace ::apache::thrift::server;
 using namespace ::apache::thrift::concurrency;
 
-//class LongShortConn<OctopusProxyServiceClient>;
 template class LongShortConn<OctopusProxyServiceClient>;
-
-class BotMessageHeader
-{
-public:
-    int    node_id_;
-    string token_;          // token
-};
 
 class BotMessageHandler
 {
