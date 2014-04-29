@@ -99,13 +99,9 @@ void CSingleCraw::Sleep(int msec)
 }
 
 
+
+
 /*
-QList<KeyWordItem>
-CSingleCraw::getTaskWordList(SimulatorTask& curTask,
-                             bool&          is_read_done)
-*/
-
-
 QList<KeyWordItem>
 CSingleCraw::getTaskWordList(QStringList&  key_words_lines,
                              bool&         is_read_done)
@@ -139,77 +135,31 @@ CSingleCraw::getTaskWordList(QStringList&  key_words_lines,
         {
           word_list.append(kwi);
         }
-        */
       }
     }
     return word_list;
 }
-
-/*
-QList<KeyWordItem>
-CSingleCraw::getTaskWordList(vector<SimulatorTask> reqTaskVector,
-                             vector<SimulatorTask>& respTaskVector,
-                             bool& is_read_done)
-{
-    QList<KeyWordItem> keyWordItemList;
-
-    if(reqTaskVector.size() != 0)
-    {
-        is_read_done = true;
-    }
-
-    for (vector<SimulatorTask>::iterator iter = reqTaskVector.begin();
-         iter != reqTaskVector.end(); iter++)
-    {
-
-      KeyWordItem kwi;
-      SimulatorTask curRespTask;
-
-      kwi.task_id = QString::number(iter->req_item.task_id);
-      kwi.click_count = iter->req_item.click_count;
-      kwi.city = QString::fromStdString(iter->req_item.city);
-      kwi.key_words = QString::fromStdString(iter->req_item.key_words);
-      kwi.url_regex = QString::fromStdString(iter->req_item.url_regex);
-
-      curRespTask.resp_item.task_id = iter->req_item.task_id;
-      curRespTask.resp_item.target_url = iter->req_item.url_regex;
-      curRespTask.resp_item.cookie = "";
-      curRespTask.resp_item.node_id = 1;
-
-
-      curRespTask.resp_item.time_stamp = this->getCurTime().toStdString();
-
-      respTaskVector.push_back(curRespTask);
-
-      for (int i = 0; i < kwi.click_count; i++)
-      {
-        keyWordItemList.append(kwi);
-      }
-    }
-    return keyWordItemList;
-}
 */
-
-
 
 QList<KeyWordItem>
 CSingleCraw::getTaskWordList(vector<BotMessage> reqTaskVector,
-                             vector<BotMessage>& respTaskVector,
-                             bool& is_read_done)
+                             vector<BotMessage>& respTaskVector
+                             )
+                             //bool& is_read_done
 {
     QList<KeyWordItem> keyWordItemList;
 
+    /*
     if(reqTaskVector.size() != 0)
     {
         is_read_done = true;
     }
+    */
 
     for (vector<BotMessage>::iterator iter = reqTaskVector.begin();
          iter != reqTaskVector.end(); iter++)
     {
-
       KeyWordItem kwi;
-      //SimulatorTask curRespTask;
       BotMessage curRespTask;
 
       kwi.task_id = QString::number(iter->simulator_task.req_item.task_id);
@@ -252,8 +202,6 @@ CSingleCraw::getCurTime()
 /*
  *
  */
-//void
-//CSingleCraw::resetPageloader(CPageLoader*& pageLoaderPtr)
 CPageLoader*
 CSingleCraw::pageLoaderFactory()
 {
@@ -615,11 +563,13 @@ CSingleCraw::waitFunction(QElapsedTimer& elapsed_timer,
   this->Sleep(sleep_time);
 }
 
-void
+bool
 CSingleCraw::keyWordProcess(QList<KeyWordItem>& word_list,
                             CPageLoader*& pageloader,
                             int spider_num)
 {
+  bool keyWordProcessDone = false;
+
   srand(unsigned(time(NULL)));
   uint pre_time = time(NULL);
   int wi = rand() % word_list.count();
@@ -631,18 +581,10 @@ CSingleCraw::keyWordProcess(QList<KeyWordItem>& word_list,
   QString url_regex = word_list[wi].url_regex;
   //while (time(NULL) - pre_time < 400 && )
 
-  while(wi >= 0)
+  while(wi-- >= 0)
   {
     std::cout<<"cur wi is : "<<wi<<std::endl;
-    wi--;
-    //int wi = rand() % word_list.count();
-    //QString id       = word_list[wi].id;
-
-    /*
-    this->id_ = word_list[wi].task_id;
-    QString key_words = word_list[wi].key_words;
-    QString url_regex = word_list[wi].url_regex;
-    */
+    //wi--;
 
     if (key_words == "" || url_regex == "") {
       qDebug() << "Warning: key_words or url_regex is NULL.";
@@ -658,13 +600,11 @@ CSingleCraw::keyWordProcess(QList<KeyWordItem>& word_list,
 
     // 百度首页 输入第一个关键词
     QWebElement dom = pageloader->GetWebElement();
-    /*
-    if (dom.toPlainText().indexOf("使用百度前必读") == -1) {
+    if (dom.toPlainText().toUtf8().indexOf("使用百度前必读") == -1) {
       qDebug() << "Can not open www.baidu.com";
       this->Sleep(3000);
       continue;
     }
-    */
 
     QWebElement input = dom.findFirst("input#kw1");
     if (input.geometry().width() < 200 || input.geometry().height() < 10) {
@@ -710,7 +650,10 @@ CSingleCraw::keyWordProcess(QList<KeyWordItem>& word_list,
 
     if (is_mousedown_ganji == false) {
       qDebug() << "Warning: Could not find url_regex.";
+      break;
     }
+
+    keyWordProcessDone = true;
 
     //void waitFunction(QElapsedTimer& elapsed_timer)
     this->waitFunction(elapsed_timer,
@@ -720,74 +663,9 @@ CSingleCraw::keyWordProcess(QList<KeyWordItem>& word_list,
 
   cout<<"=========================="<<endl;
 
+  return keyWordProcessDone;
 }
 
-/*
- * changed by lizhongyuan,
- * the function
- */
-//void
-/*
-vector<SimulatorTask>
-CSingleCraw::BaiduSEOTest(vector<SimulatorTask> reqTaskVector,
-                          int spider_num)
-{
-  //vector<
-  for(vector<SimulatorTask>::iterator iter = reqTaskVector.begin(); iter != reqTaskVector.end(); iter++)
-  {
-      this->SEOTaskVector_.push_back(*iter);
-  }
-  vector<SimulatorTask> respTaskVector;
-
-  while (true)
-  {
-    if (reqTaskVector.empty())
-    {
-      qDebug() << "No task right now. sleep 70s";
-      this->Sleep(70000);
-      continue;
-    }
-
-    bool is_read_done = false;
-
-    // build the keyWordItemList
-
-    QList<KeyWordItem> keyWordItemList = this->getTaskWordList(reqTaskVector,
-                                                         respTaskVector,
-                                                         is_read_done);
-
-    qDebug() << "keyWordItemList count():" << keyWordItemList.count();
-    if (is_read_done == false) {
-      qDebug() << "Could not finish reading key word list.";
-      this->Sleep(3000);
-      continue;
-    }
-    if (keyWordItemList.count() == 0) {
-      qDebug() << "Empty key word list.";
-      this->Sleep(3000);
-      continue;
-    }
-
-    // get a pageloader
-    // this->resetPageloader(pageloader);
-    CPageLoader* pageloader = CSingleCraw::pageLoaderFactory();
-    if(pageloader == NULL)
-    {
-      continue;
-    }
-
-    this->keyWordProcess(keyWordItemList,
-                         pageloader,
-                         spider_num);
-
-    delete pageloader;
-    pageloader = NULL;
-    // need delete the pageloader
-  }
-
-  return respTaskVector;
-}
-*/
 
 vector<BotMessage>
 CSingleCraw::BaiduSEOTest(vector<BotMessage> reqTaskVector,
@@ -795,70 +673,45 @@ CSingleCraw::BaiduSEOTest(vector<BotMessage> reqTaskVector,
 {
     vector<BotMessage> respTaskVector;
 
-    /*
-    while (true)
+    if (reqTaskVector.empty())
     {
-    */
-      if (reqTaskVector.empty())
-      {
-        qDebug() << "No task right now. sleep 70s";
-        this->Sleep(70000);
-        //continue;
+      qDebug() << "No task right now. sleep 70s";
+      this->Sleep(70000);
+      return respTaskVector;
+    }
 
-        return respTaskVector;
-      }
-
-      bool is_read_done = false;
-
-      /*
-       * build the keyWordItemList
-       */
-
-      QList<KeyWordItem> keyWordItemList = this->getTaskWordList(reqTaskVector,
-                                                                 respTaskVector,
-                                                                 is_read_done);
-
-      qDebug() << "keyWordItemList count():" << keyWordItemList.count();
-      if (is_read_done == false) {
-        qDebug() << "Could not finish reading key word list.";
-        this->Sleep(3000);
-        //continue;
-
-        return respTaskVector;
-      }
-      if (keyWordItemList.count() == 0) {
-        qDebug() << "Empty key word list.";
-        this->Sleep(3000);
-        //continue;
-
-        return respTaskVector;
-      }
-
-      // get a pageloader
-      // this->resetPageloader(pageloader);
-      CPageLoader* pageloader = CSingleCraw::pageLoaderFactory();
-      if(pageloader == NULL)
-      {
-        //continue;
-          return respTaskVector;
-      }
-
-      this->keyWordProcess(keyWordItemList,
-                           pageloader,
-                           spider_num);
-
-      delete pageloader;
-      pageloader = NULL;
-      // need delete the pageloader
+    //bool is_read_done = false;
 
     /*
+     * build the keyWordItemList
+     */
+    QList<KeyWordItem> keyWordItemList = this->getTaskWordList(reqTaskVector,
+                                                               respTaskVector
+                                                               );
+                                                               //is_read_done
+
+    qDebug() << "keyWordItemList count():" << keyWordItemList.count();
+
+    CPageLoader* pageloader = CSingleCraw::pageLoaderFactory();
+    if(pageloader == NULL)
+    {
+        respTaskVector.clear();
+        return respTaskVector;
     }
-    */
+
+    // need ret
+    if(!this->keyWordProcess(keyWordItemList,
+                         pageloader,
+                         spider_num))
+    {
+        respTaskVector.clear();
+    }
+
+    delete pageloader;
+    pageloader = NULL;
 
     return respTaskVector;
 }
-
-
 
 void SeoRankRepotThread::run()
 {

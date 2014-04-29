@@ -8,6 +8,8 @@
 #include "manager/csinglecraw.h"
 #include "SEOTaskStream/seocontroller.h"
 
+//#include<QTextStream>
+
 using namespace ganji::crawler::octopus_crawler::downloader;
 
 void SetCharset() {
@@ -16,6 +18,8 @@ void SetCharset() {
   QTextCodec::setCodecForLocale(codec);
   QTextCodec::setCodecForCStrings(codec);
   QTextCodec::setCodecForTr(codec);
+
+  //QTextStream::setCodec("UTF-8");
 }
 
 void SigTerm(int x) {

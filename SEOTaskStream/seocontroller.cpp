@@ -1,8 +1,6 @@
 ﻿//#include "seodownloader.h"
 #include "seocontroller.h"
 
-
-
 #include<stdlib.h>
 #include<iostream>
 #include<list>
@@ -61,6 +59,7 @@ SEOController::Work()
                                                  this->reqTaskVector_,
                                                  this->download_queue_,
                                                  this->download_cond_);
+
     this->getBotMsgThread_->start();
 
     this->seoWorkThread_ = new SEOWorkThread(this->octopusServerConnPtr_,
@@ -69,6 +68,7 @@ SEOController::Work()
                                             this->upload_queue_,
                                             this->download_cond_,
                                             this->download_cond_);
+
     this->seoWorkThread_->run();
 }
 

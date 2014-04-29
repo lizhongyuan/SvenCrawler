@@ -13,6 +13,7 @@ GetBotMsgThread::run()
         {
           this->moveToQueue();
         }
+        boost::this_thread::sleep(boost::posix_time::seconds(1));
     }
 }
 
@@ -20,6 +21,8 @@ int
 GetBotMsgThread::getTask()
 {
     int ret = -2;
+
+    bool isGetBotTask;
 
     NodeState curNodeState;
     curNodeState.node_id = "lizhongyuan";
@@ -36,36 +39,42 @@ GetBotMsgThread::getTask()
           ret = -1;
           break;
         }
+      }
 
-        for (int i = 0; i < this->confSettingPtr_->value("downloader/RETRY_TIMES").toInt() ; i++)
+      for (int i = 0; i < this->confSettingPtr_->value("downloader/RETRY_TIMES").toInt() ; i++)
+      {
+        try
         {
-          try
+          isGetBotTask = this->octopusServerConnPtr_->GetBotTask(BotTasktypes::type::KSEOTASK,
+                                                                  this->reqTaskVector_,
+                                                                  curNodeState);
+          cout<<"???????????????????????????????"<<endl;
+          if(isGetBotTask != true)
           {
-            this->octopusServerConnPtr_->GetBotTask(BotTasktypes::type::KSEOTASK,
-                                                    this->reqTaskVector_,
-                                                    curNodeState);
-            this->octopusServerConnPtr_->IncrTimes();
-            ret = 0;
+              cout<<"can't get the bottask, wait for next turn"<<endl;
+              break;
+          }
+          this->octopusServerConnPtr_->IncrTimes();
+          ret = 0;
+          break;
+        }
+        catch(...)
+        {
+          ret = -1;
+          bool is_ok = this->octopusServerConnPtr_->Reset();
+          if (!is_ok)
+          {
+            this->ioMutex_.lock();
+            qDebug()<<"get downloadTask failed, but Reset ok.";
+            this->ioMutex_.unlock();
+            // qt log
             break;
           }
-          catch(...)
+          else
           {
-            ret = -1;
-            bool is_ok = this->octopusServerConnPtr_->Reset();
-            if (!is_ok)
-            {
-              this->ioMutex_.lock();
-              qDebug()<<"get downloadTask failed, but Reset ok.";
-              this->ioMutex_.unlock();
-              // qt log
-              break;
-            }
-            else
-            {
-              this->ioMutex_.lock();
-              qDebug()<<"get downloadTask failed. Reset failed";
-              this->ioMutex_.unlock();
-            }
+            this->ioMutex_.lock();
+            qDebug()<<"get downloadTask failed. Reset failed";
+            this->ioMutex_.unlock();
           }
         }
       }

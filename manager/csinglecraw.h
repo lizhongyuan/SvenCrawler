@@ -29,8 +29,10 @@ class CSingleCraw : public QObject
 public:
   explicit CSingleCraw(QObject *parent = 0);
 
+    /*
   QList<KeyWordItem> getTaskWordList(QStringList&  key_word_lines,
                                      bool&         is_read_done);
+                                     */
 
   /*
   QList<KeyWordItem> getTaskWordList(vector<SimulatorTask> reqTaskVector,
@@ -39,8 +41,8 @@ public:
   */
 
   QList<KeyWordItem> getTaskWordList(vector<BotMessage> reqTaskVector,
-                                     vector<BotMessage>& respTaskVector,
-                                     bool& is_read_done);
+                                     vector<BotMessage>& respTaskVector);
+                                     //bool& is_read_done);
 
   /*
   QList<KeyWordItem> getTaskList(vector<SimulatorTask>  taskVector,
@@ -52,7 +54,7 @@ public:
                            QWebElement& input);
   void getAndClickButton(QWebElement&   dom,
                          CPageLoader*&  pageloader);
-  void keyWordProcess(QList<KeyWordItem>& word_list,
+  bool keyWordProcess(QList<KeyWordItem>& word_list,
                       CPageLoader*& pageloader,
                       int spider_num);
   void simulateInputKeyWord(QString key_word,
