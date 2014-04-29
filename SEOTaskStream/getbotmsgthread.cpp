@@ -29,7 +29,6 @@ GetBotMsgThread::getTask()
     this->getMutex_.lock();
     do
     {
-      //this->getMutex_.lock();
       if (this->octopusServerConnPtr_->NeedReset())
       {
         bool is_ok = this->octopusServerConnPtr_->Reset();
@@ -37,40 +36,39 @@ GetBotMsgThread::getTask()
           ret = -1;
           break;
         }
-      }
 
-      for (int i = 0; i < this->confSettingPtr_->value("downloader/RETRY_TIMES").toInt() ; i++)
-      {
-        try
+        for (int i = 0; i < this->confSettingPtr_->value("downloader/RETRY_TIMES").toInt() ; i++)
         {
-          this->octopusServerConnPtr_->GetBotTask(BotTasktypes::type::KSEOTASK,
-                                                  this->reqTaskVector_,
-                                                  curNodeState);
-          this->octopusServerConnPtr_->IncrTimes();
-          ret = 0;
-          break;
-        }
-        catch(...)
-        {
-          ret = -1;
-          bool is_ok = this->octopusServerConnPtr_->Reset();
-          if (!is_ok)
+          try
           {
-            this->ioMutex_.lock();
-            qDebug()<<"get downloadTask failed, but Reset ok.";
-            this->ioMutex_.unlock();
-            // qt log
+            this->octopusServerConnPtr_->GetBotTask(BotTasktypes::type::KSEOTASK,
+                                                    this->reqTaskVector_,
+                                                    curNodeState);
+            this->octopusServerConnPtr_->IncrTimes();
+            ret = 0;
             break;
           }
-          else
+          catch(...)
           {
-            this->ioMutex_.lock();
-            qDebug()<<"get downloadTask failed. Reset failed";
-            this->ioMutex_.unlock();
+            ret = -1;
+            bool is_ok = this->octopusServerConnPtr_->Reset();
+            if (!is_ok)
+            {
+              this->ioMutex_.lock();
+              qDebug()<<"get downloadTask failed, but Reset ok.";
+              this->ioMutex_.unlock();
+              // qt log
+              break;
+            }
+            else
+            {
+              this->ioMutex_.lock();
+              qDebug()<<"get downloadTask failed. Reset failed";
+              this->ioMutex_.unlock();
+            }
           }
         }
       }
-      //this->getMutex_.unlock();
     } while (0);
 
     this->getMutex_.unlock();

@@ -18,11 +18,7 @@
 
 
 namespace ganji { namespace crawler { namespace octopus_crawler { namespace downloader {
-//using namespace net;
 using namespace std;
-
-//class net::BotMessageHandler;
-
 
 class GetBotMsgThread : public QThread
 {

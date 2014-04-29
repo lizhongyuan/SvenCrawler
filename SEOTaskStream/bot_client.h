@@ -59,14 +59,6 @@ class BotMessageHandler
 public:
   int  Init(const string &peer_ip, int peer_port, int socket_timeout, int check_interval);
 
-  //bool GetBotTask(const BotTasktypes::type bot_task_type, const std::vector<BotMessage> &requests);
-  /*
-  bool GetBotTask(
-              std::vector<BotMessage> &requests,
-              const BotTasktypes::type bot_task_type,
-              const NodeState& node_state
-              );
-  */
   bool GetBotTask(const BotTasktypes::type bot_task_type,
                   std::vector<BotMessage> &requests,
                   const NodeState& node_state);
