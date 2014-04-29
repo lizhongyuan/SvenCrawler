@@ -621,15 +621,27 @@ CSingleCraw::keyWordProcess(QList<KeyWordItem>& word_list,
 {
   srand(unsigned(time(NULL)));
   uint pre_time = time(NULL);
-  while (time(NULL) - pre_time < 400)
+  int wi = rand() % word_list.count();
+
+  std::cout<<"keyWordList's size is"<<word_list.size()<<std::endl;
+
+  this->id_ = word_list[wi].task_id;
+  QString key_words = word_list[wi].key_words;
+  QString url_regex = word_list[wi].url_regex;
+  //while (time(NULL) - pre_time < 400 && )
+
+  while(wi >= 0)
   {
-    int wi = rand() % word_list.count();
+    std::cout<<"cur wi is : "<<wi<<std::endl;
+    wi--;
+    //int wi = rand() % word_list.count();
     //QString id       = word_list[wi].id;
 
-    //this->id_       = word_list[wi].id;
+    /*
     this->id_ = word_list[wi].task_id;
     QString key_words = word_list[wi].key_words;
     QString url_regex = word_list[wi].url_regex;
+    */
 
     if (key_words == "" || url_regex == "") {
       qDebug() << "Warning: key_words or url_regex is NULL.";
@@ -704,6 +716,9 @@ CSingleCraw::keyWordProcess(QList<KeyWordItem>& word_list,
                           word_list,
                           spider_num);
   }
+
+  cout<<"=========================="<<endl;
+
 }
 
 /*
@@ -780,13 +795,17 @@ CSingleCraw::BaiduSEOTest(vector<BotMessage> reqTaskVector,
     //vector<SimulatorTask> respTaskVector;
     vector<BotMessage> respTaskVector;
 
+    /*
     while (true)
     {
+    */
       if (reqTaskVector.empty())
       {
         qDebug() << "No task right now. sleep 70s";
         this->Sleep(70000);
-        continue;
+        //continue;
+
+        return respTaskVector;
       }
 
       bool is_read_done = false;
@@ -803,12 +822,16 @@ CSingleCraw::BaiduSEOTest(vector<BotMessage> reqTaskVector,
       if (is_read_done == false) {
         qDebug() << "Could not finish reading key word list.";
         this->Sleep(3000);
-        continue;
+        //continue;
+
+        return respTaskVector;
       }
       if (keyWordItemList.count() == 0) {
         qDebug() << "Empty key word list.";
         this->Sleep(3000);
-        continue;
+        //continue;
+
+        return respTaskVector;
       }
 
       // get a pageloader
@@ -816,7 +839,8 @@ CSingleCraw::BaiduSEOTest(vector<BotMessage> reqTaskVector,
       CPageLoader* pageloader = CSingleCraw::pageLoaderFactory();
       if(pageloader == NULL)
       {
-        continue;
+        //continue;
+          return respTaskVector;
       }
 
       this->keyWordProcess(keyWordItemList,
@@ -826,7 +850,10 @@ CSingleCraw::BaiduSEOTest(vector<BotMessage> reqTaskVector,
       delete pageloader;
       pageloader = NULL;
       // need delete the pageloader
+
+    /*
     }
+    */
 
     return respTaskVector;
 }

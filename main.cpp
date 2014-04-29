@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
 
   QApplication a(argc, argv);
   SetCharset();
-  /*
+
   signal(SIGTERM, SigTerm);
   signal(SIGINT,  SigTerm);
 #ifdef LINUX
@@ -36,6 +36,7 @@ int main(int argc, char *argv[])
   signal(SIGHUP,  SigTerm);
 #endif
 
+  /*
   int spider_num = 0;
 
   if (a.arguments().size() >= 2)
@@ -43,6 +44,7 @@ int main(int argc, char *argv[])
     //spider_num = a.arguments().at(1).toInt();
     spider_num = 1;
   }
+
    // if argc >= 5, set the proxy's attribute value
   if (a.arguments().size() >= 5)
   {

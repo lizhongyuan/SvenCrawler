@@ -17,8 +17,11 @@ SEOWorkThread::run()
     while(true)
     {
         vector<BotMessage>  reqTaskVector = this->outOffQueue();
-        vector<BotMessage>  respTaskVector = this->SEOprocess(reqTaskVector);
-        this->sendTask(respTaskVector);
+        if(reqTaskVector.size() != 0)
+        {
+          vector<BotMessage>  respTaskVector = this->SEOprocess(reqTaskVector);
+          this->sendTask(respTaskVector);
+        }
     }
 }
 
@@ -30,8 +33,8 @@ SEOWorkThread::outOffQueue()
     while(this->download_queue_.empty())
     {
         this->ioMutex_.lock();
-        cout<<"The download_queue is empty."<<endl;
-        cout<<"The upload_queue_ size is "<<this->upload_queue_.size()<<endl;
+        //cout<<"The download_queue is empty."<<endl;
+        //cout<<"The upload_queue_ size is "<<this->upload_queue_.size()<<endl;
         this->ioMutex_.unlock();
         this->download_cond_.wait(&this->workMutex_);
     }

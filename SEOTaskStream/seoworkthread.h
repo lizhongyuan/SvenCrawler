@@ -9,8 +9,6 @@
 #include <QWaitCondition>
 #include <vector>
 #include <queue>
-//#include"gen-cpp/octopus_crawler_types.h"
-//#include"gen-cpp/OctopusProxyService.h"
 #include"gen-cpp/octopus_crawler_constants.h"
 #include "manager/csinglecraw.h"
 #include<QWaitCondition>
@@ -24,14 +22,11 @@ namespace ganji { namespace crawler { namespace octopus_crawler { namespace down
 using namespace net;
 using namespace std;
 
-//class net::BotMessageHandler;
-
 
 class SEOWorkThread : public QThread
 {
     Q_OBJECT
 public:
-    //explicit SEOWorkThread(QObject *parent = 0);
     SEOWorkThread(net::BotMessageHandler* octopusServerConnPtr,
                   QSettings*              confSettingPtr,
                   queue<BotMessage>&      download_queue,
@@ -60,7 +55,6 @@ public slots:
 
 private:
     net::BotMessageHandler* octopusServerConnPtr_;
-    //BotMessageHandler* octopusServerConnPtr_;
     QSettings*              confSettingPtr_;
     queue<BotMessage>&      download_queue_;
     queue<BotMessage>&      upload_queue_;

@@ -23,14 +23,7 @@
 #include "seoworkthread.h"
 #include "uploadbotmsgthread.h"
 
-
-
 namespace ganji { namespace crawler { namespace octopus_crawler { namespace downloader {
-
-//using namespace net;
-
-
-//class net::BotMessageHandler;
 
 class SEOdownloader;
 
@@ -56,24 +49,13 @@ public:
       }
   }
 
-  int Init(QSettings* confSettingPtr);
-  void Run();
+  int
+  Init(QSettings* confSettingPtr);
+
+  void
+  Run();
 
 public:
-
-  /*
-  static void* GetTaskThread(void *arg);
-  int GetTaskFunc();
-  static void* UploadTaskThread(void* arg);
-  int UploadTaskFunc();
-  static void* SEOTaskThread(void *arg);
-  int SEOTaskFunc();
-  */
-
-  /*
-  vector<SimulatorTask> testSEOprocess(vector<SimulatorTask>& reqTask);
-  vector<SimulatorTask> testSEOprocess2(vector<SimulatorTask>& reqTask);
-  */
 
 private:
   net::BotMessageHandler* octopusServerConnPtr_;
@@ -87,13 +69,11 @@ private:
 
   GetBotMsgThread*    getBotMsgThread_;
   SEOWorkThread*      seoWorkThread_;
-  //UploadBotMsgThread* uploadBotMsgThread_;
 
   QWaitCondition  download_cond_;
   QWaitCondition  upload_cond_;
 
   QMutex  ioMutex_;
-
 
   CSingleCraw* singlecraw_;
 };

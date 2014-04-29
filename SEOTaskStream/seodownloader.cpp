@@ -125,12 +125,6 @@ SEOdownloader::Init(QSettings* confSettingPtr)
 void
 SEOdownloader::Run()
 {
-    /*
-    this->getBotTaskThread_ = boost::thread(boost::bind(GetTaskThread, this));
-    this->popThread_ = boost::thread(boost::bind(SEOTaskThread, this));
-    this->uploadThread_ = boost::thread(boost::bind(UploadTaskThread, this));
-    */
-
     this->getBotMsgThread_ = new GetBotMsgThread(this->octopusServerConnPtr_,
                                                  this->confSettingPtr_,
                                                  this->reqTaskVector_,
@@ -144,7 +138,6 @@ SEOdownloader::Run()
                                             this->upload_queue_,
                                             this->download_cond_,
                                             this->download_cond_);
-    //this->seoWorkThread_->start();
     this->seoWorkThread_->run();
 }
 
