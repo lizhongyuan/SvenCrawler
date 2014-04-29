@@ -21,26 +21,25 @@
 #include "manager/csinglecraw.h"
 #include "getbotmsgthread.h"
 #include "seoworkthread.h"
-#include "uploadbotmsgthread.h"
 
 namespace ganji { namespace crawler { namespace octopus_crawler { namespace downloader {
 
-class SEOdownloader;
+class SEOController;
 
 /**
- * @class SEOdownloader
+ * @class SEOController
  * @brief 管理一个downloader与dc间的连接和下载需求
  */
-class SEOdownloader
+class SEOController
 {
 public:
-  SEOdownloader()
+  SEOController()
   {
     this->confSettingPtr_ = NULL;
     this->octopusServerConnPtr_ = NULL;
   }
 
-  ~SEOdownloader()
+  ~SEOController()
   {
       if(this->confSettingPtr_ != NULL)
       {

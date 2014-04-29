@@ -6,7 +6,7 @@
 
 #include <signal.h>
 #include "manager/csinglecraw.h"
-#include "SEOTaskStream/seodownloader.h"
+#include "SEOTaskStream/seocontroller.h"
 
 using namespace ganji::crawler::octopus_crawler::downloader;
 
@@ -24,7 +24,6 @@ void SigTerm(int x) {
 
 int main(int argc, char *argv[])
 {
-
   QApplication a(argc, argv);
   SetCharset();
 
@@ -36,65 +35,12 @@ int main(int argc, char *argv[])
   signal(SIGHUP,  SigTerm);
 #endif
 
-  /*
-  int spider_num = 0;
-
-  if (a.arguments().size() >= 2)
-  {
-    //spider_num = a.arguments().at(1).toInt();
-    spider_num = 1;
-  }
-
-   // if argc >= 5, set the proxy's attribute value
-  if (a.arguments().size() >= 5)
-  {
-    // 设置全局代理，整个应用程序生存范围。
-    QString hostname = a.arguments().at(3);
-    int     port     = a.arguments().at(4).toInt();
-    qDebug() << "use Proxy. hostname:" << hostname << "port:" << port;
-    QNetworkProxy proxy;
-
-    proxy.setType(QNetworkProxy::HttpProxy);
-    proxy.setHostName(hostname);
-    proxy.setPort(port);
-    QNetworkProxy::setApplicationProxy(proxy);
-    // proxy.setType(QNetworkProxy::HttpCachingProxy);
-    // proxy.setCapabilities(QNetworkProxy::CachingCapability);
-  }
-
-  qDebug() << "Spider Num:" << spider_num;
-
-  */
-
   QSettings* seoSetting = new QSettings("D:\\crawler_bot_conf.ini",  QSettings::IniFormat);
 
-  SEOdownloader seoDownloader;
+  SEOController seoController;
 
-  seoDownloader.Init(seoSetting);
-  seoDownloader.Run();
-
-  /*
-  // crawler begin
-  CSingleCraw singlecraw;
-  if (spider_num <= 0 || spider_num >= 100)
-  {
-    qDebug() << "Error spider_num:" << spider_num;
-    exit(1);
-  }
-  else
-  {
-    singlecraw.Start(spider_num);
-  }
-  */
+  seoController.Init(seoSetting);
+  seoController.Run();
 
   return a.exec();
 }
-
-/*
-int main(int argc, char *argv[])
-{
-    QCoreApplication a(argc, argv);
-
-    return a.exec();
-}
-*/

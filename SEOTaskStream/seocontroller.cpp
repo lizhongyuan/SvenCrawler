@@ -1,4 +1,5 @@
-﻿#include "seodownloader.h"
+﻿//#include "seodownloader.h"
+#include "seocontroller.h"
 
 
 
@@ -17,11 +18,11 @@ using namespace net;
 
 /*
 void*
-SEOdownloader::GetTaskThread(void *arg)
+SEOController::GetTaskThread(void *arg)
 {
   try
   {
-    SEOdownloader *p_seodownloader = reinterpret_cast<SEOdownloader *>(arg);
+    SEOController *p_seodownloader = reinterpret_cast<SEOController *>(arg);
     assert(p_seodownloader);
 
     int time_slice = 100;
@@ -48,9 +49,9 @@ SEOdownloader::GetTaskThread(void *arg)
 }
 
 void*
-SEOdownloader::SEOTaskThread(void *arg)
+SEOController::SEOTaskThread(void *arg)
 {
-    SEOdownloader *p_seodownloader = reinterpret_cast<SEOdownloader *>(arg);
+    SEOController *p_seodownloader = reinterpret_cast<SEOController *>(arg);
     assert(p_seodownloader);
 
     int time_slice = 100;
@@ -66,9 +67,9 @@ SEOdownloader::SEOTaskThread(void *arg)
 
 
 void*
-SEOdownloader::UploadTaskThread(void *arg)
+SEOController::UploadTaskThread(void *arg)
 {
-    SEOdownloader *p_seodownloader = reinterpret_cast<SEOdownloader *>(arg);
+    SEOController *p_seodownloader = reinterpret_cast<SEOController *>(arg);
     assert(p_seodownloader);
 
     int time_slice = 100;
@@ -84,7 +85,7 @@ SEOdownloader::UploadTaskThread(void *arg)
 */
 
 int
-SEOdownloader::Init(QSettings* confSettingPtr)
+SEOController::Init(QSettings* confSettingPtr)
 {
   this->confSettingPtr_ = confSettingPtr;
   if(!confSettingPtr)
@@ -123,7 +124,7 @@ SEOdownloader::Init(QSettings* confSettingPtr)
 }
 
 void
-SEOdownloader::Run()
+SEOController::Run()
 {
     this->getBotMsgThread_ = new GetBotMsgThread(this->octopusServerConnPtr_,
                                                  this->confSettingPtr_,
@@ -147,7 +148,7 @@ SEOdownloader::Run()
  */
 /*
 int
-SEOdownloader::SEOTaskFunc()
+SEOController::SEOTaskFunc()
 {
   boost::mutex::scoped_lock SEOLock(this->SEOtask_lock_);
 
@@ -194,7 +195,7 @@ SEOdownloader::SEOTaskFunc()
 } //end
 
 vector<SimulatorTask>
-SEOdownloader::testSEOprocess2(vector<SimulatorTask>& reqTaskVector)
+SEOController::testSEOprocess2(vector<SimulatorTask>& reqTaskVector)
 {
 
   vector<SimulatorTask> respTaskVector;
@@ -202,7 +203,7 @@ SEOdownloader::testSEOprocess2(vector<SimulatorTask>& reqTaskVector)
 }
 
 vector<SimulatorTask>
-SEOdownloader::testSEOprocess(vector<SimulatorTask>& reqTask)
+SEOController::testSEOprocess(vector<SimulatorTask>& reqTask)
 {
   vector<SimulatorTask> respTaskVector;
   for(vector<SimulatorTask>::iterator iter = reqTask.begin(); iter != reqTask.end(); iter++)
@@ -221,7 +222,7 @@ SEOdownloader::testSEOprocess(vector<SimulatorTask>& reqTask)
 }
 
 int
-SEOdownloader::UploadTaskFunc()
+SEOController::UploadTaskFunc()
 {
   int ret = -1;
   bool upload_ok;
@@ -337,7 +338,7 @@ SEOdownloader::UploadTaskFunc()
 }
 
 int
-SEOdownloader::GetTaskFunc()
+SEOController::GetTaskFunc()
 {
   int ret = -2;
   vector<BotMessage> reqBotMsgVector;
