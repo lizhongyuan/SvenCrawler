@@ -17,9 +17,11 @@
 using namespace std;
 
 CSingleCraw::CSingleCraw(QObject *parent) : QObject(parent) {
-  //connect(&(this->timer_), SIGNAL(timeout()), this, SLOT(QuitEventLoop()));
-  //connect(&(this->http_get_task_timer_), SIGNAL(timeout()), this, SLOT(HttpGetSeoTask()));
+  connect(&(this->timer_), SIGNAL(timeout()), this, SLOT(QuitEventLoop()));
+  connect(&(this->http_get_task_timer_), SIGNAL(timeout()), this, SLOT(HttpGetSeoTask()));
   connect(&(this->timer_), SIGNAL(timeout()), this, SLOT(QuitEventLoop()), Qt::QueuedConnection);
+
+
   connect(&(this->http_get_task_timer_), SIGNAL(timeout()), this, SLOT(HttpGetSeoTask()), Qt::QueuedConnection);
   this->HttpGetSeoTask();
   this->http_get_task_timer_.start(60000);
@@ -220,9 +222,8 @@ CSingleCraw::getTaskWordList(vector<BotMessage> reqTaskVector,
       curRespTask.simulator_task.resp_item.target_url = iter->simulator_task.req_item.url_regex;
       curRespTask.simulator_task.resp_item.cookie = "";
       curRespTask.simulator_task.resp_item.node_id = 1;
-
-
       curRespTask.simulator_task.resp_item.time_stamp = this->getCurTime().toStdString();
+      curRespTask.bot_task_types = BotTasktypes::type::KSEOTASK;
 
       respTaskVector.push_back(curRespTask);
 
@@ -792,7 +793,6 @@ vector<BotMessage>
 CSingleCraw::BaiduSEOTest(vector<BotMessage> reqTaskVector,
                           int spider_num) // baidu.com 刷百度SE
 {
-    //vector<SimulatorTask> respTaskVector;
     vector<BotMessage> respTaskVector;
 
     /*

@@ -28,8 +28,7 @@ class GetBotMsgThread : public QThread
 {
     Q_OBJECT
 public:
-    GetBotMsgThread(
-                    net::BotMessageHandler* octopusServerConnPtr,
+    GetBotMsgThread(net::BotMessageHandler* octopusServerConnPtr,
                     QSettings*              confSettingPtr,
                     vector<BotMessage>      reqTaskVector,
                     queue<BotMessage>&      download_queue,

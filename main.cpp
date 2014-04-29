@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
   SEOController seoController;
 
   seoController.Init(seoSetting);
-  seoController.Run();
+  seoController.Work();
 
   return a.exec();
 }

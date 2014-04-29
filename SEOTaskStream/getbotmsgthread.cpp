@@ -8,8 +8,11 @@ GetBotMsgThread::run()
 {
     while(true)
     {
-        this->getTask();
-        this->moveToQueue();
+        int ret = this->getTask();
+        if(ret == 0)
+        {
+          this->moveToQueue();
+        }
     }
 }
 
@@ -54,7 +57,7 @@ GetBotMsgThread::getTask()
           if (!is_ok)
           {
             this->ioMutex_.lock();
-            qDebug()<<"get downloadTask failed, and Reset failed.";
+            qDebug()<<"get downloadTask failed, but Reset ok.";
             this->ioMutex_.unlock();
             // qt log
             break;
@@ -62,7 +65,7 @@ GetBotMsgThread::getTask()
           else
           {
             this->ioMutex_.lock();
-            qDebug()<<"get downloadTask failed.";
+            qDebug()<<"get downloadTask failed. Reset failed";
             this->ioMutex_.unlock();
           }
         }
@@ -120,7 +123,6 @@ GetBotMsgThread::moveToQueue()
         boost::this_thread::sleep(boost::posix_time::milliseconds(9));
 
         this->getMutex_.unlock();
-        //this->download_cond_.wakeAll();
     }
 
     this->download_cond_.wakeAll();   // tell the SEOworkThread

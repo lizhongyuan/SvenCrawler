@@ -24,7 +24,7 @@
 
 namespace ganji { namespace crawler { namespace octopus_crawler { namespace downloader {
 
-class SEOController;
+//class SEOController;
 
 /**
  * @class SEOController
@@ -52,7 +52,7 @@ public:
   Init(QSettings* confSettingPtr);
 
   void
-  Run();
+  Work();
 
 public:
 
