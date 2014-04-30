@@ -273,123 +273,45 @@ CSingleCraw::getSpanElem(QWebElement& spanElem,
   return isExist;
 }
 
-/*
-void
-CSingleCraw::processSpanElem(QString& keyWordRank,
-                             QWebElement& spanElem,
-                             QWebElement& rollPageBtn,
-                             int& scroll_height,
-                             int& windowHeight,
-                             int& scroll_bar_maximun,
-                             QString url_regex,
-                             CPageLoader*& pageloader,
-                             bool& is_click,
-                             bool& is_mousedown_ganji,
-                             bool& is_prepare_ganji)
-{
-  QString span_str = spanElem.toPlainText().trimmed();
-  url_regex = url_regex.replace("http://", "");
-
-  // get the scroller's position
-  int x = rollPageBtn.geometry().left() + (rand() % rollPageBtn.geometry().width());
-  int y = rollPageBtn.geometry().top()  + (rand() % rollPageBtn.geometry().height()) - scroll_height;
-
-  if (span_str.indexOf(url_regex) >= 0 && is_mousedown_ganji == false && (!InBlackList(span_str)))
-  {
-    is_click = true;
-    is_prepare_ganji = true;
-  }
-
-  if (is_click == true)
-  {
-    while (y > windowHeight - (rand() % 100 + 30))
-    {
-      int rand_scroll = 100 + rand() % 2;
-
-      if (scroll_height + rand_scroll < scroll_bar_maximun) // in the mid
-      {
-        y -= rand_scroll;               //向下移动rand_scroll
-        scroll_height += rand_scroll;   // same as above
-        pageloader->GetWebView()->page()->mainFrame()->scroll(0, rand_scroll);
-      }
-      else                                                  // to the end
-      {
-        int next_scroll = scroll_bar_maximun - scroll_height;
-        y -= next_scroll;
-        scroll_height += next_scroll;
-        pageloader->GetWebView()->page()->mainFrame()->scroll(0, scroll_height);
-      }
-      this->Sleep(rand() % 200 + 400);
-    }
-    this->Sleep(rand() % 500 + 500);
-
-    QString refuse_url = "";
-    QStringList url_tmp_list = span_str.replace("...", " ").trimmed().split(" ");
-    if (url_tmp_list.count() >= 1)
-    {
-      refuse_url = QUrl("http://" + url_tmp_list[0]).host();
-    }
-
-    qDebug() << "span_str:" << span_str << " : " << url_tmp_list;
-    pageloader->m_mynetworkAccessManager.SetRefuseUrl(refuse_url);
-    qDebug() << "Link Pos scrolled:" << x << y;
-    QTest::mouseEvent(QTest::MouseClick, pageloader->GetWebView(), Qt::LeftButton, Qt::NoModifier, QPoint(x, y), -1);
-    this->rank_ = keyWordRank;
-    this->Sleep(rand() % 1000 + 2000);
-
-    if (is_prepare_ganji == true)
-    {
-      SeoRankRepotThread seo_rank_report_thread;
-      seo_rank_report_thread.id_   = this->id_;
-      //seo_rank_report_thread.rank_ = resultBlockCollection[resultBlockIdex].attribute("id");
-      seo_rank_report_thread.rank_ = this->rank_;
-      seo_rank_report_thread.run();
-
-      this->Sleep(rand() % 500 + 1000);
-      is_mousedown_ganji = true;
-    }
-  }
-}
-*/
 
 
 //void
 bool
 CSingleCraw::processSpanElem(QString& keyWordRank,
                              QWebElement& spanElem,
-                             QWebElement& rollPageBtn,
+                             QWebElement& clickLinkElement,
                              int& scroll_height,
                              int& windowHeight,
                              int& scroll_bar_maximun,
                              QString url_regex,
                              CPageLoader*& pageloader)
 {
-  QString span_str = spanElem.toPlainText().trimmed();
+  QString spanStr = spanElem.toPlainText().trimmed();
   url_regex = url_regex.replace("http://", "");
-  if (span_str.indexOf(url_regex) < 0 || InBlackList(span_str))
+  if (spanStr.indexOf(url_regex) < 0 || InBlackList(spanStr))
   {
       return false;
   }
 
   // get the scroller's position
-  int x = rollPageBtn.geometry().left() + (rand() % rollPageBtn.geometry().width());
-  int y = rollPageBtn.geometry().top()  + (rand() % rollPageBtn.geometry().height()) - scroll_height;
+  int clickXPos = clickLinkElement.geometry().left() + (rand() % clickLinkElement.geometry().width());
+  int clickYPos = clickLinkElement.geometry().top()  + (rand() % clickLinkElement.geometry().height()) - scroll_height;
 
 
-  while (y > windowHeight - (rand() % 100 + 30))
+  while (clickYPos > windowHeight - (rand() % 100 + 30))
   {
     int rand_scroll = 100 + rand() % 2;
 
     if (scroll_height + rand_scroll < scroll_bar_maximun) // in the mid
     {
-      y -= rand_scroll;               //向下移动rand_scroll
+      clickYPos -= rand_scroll;               //向下移动rand_scroll
       scroll_height += rand_scroll;   // same as above
       pageloader->GetWebView()->page()->mainFrame()->scroll(0, rand_scroll);
     }
     else                                                  // to the end
     {
       int next_scroll = scroll_bar_maximun - scroll_height;
-      y -= next_scroll;
+      clickYPos -= next_scroll;
       scroll_height += next_scroll;
       pageloader->GetWebView()->page()->mainFrame()->scroll(0, scroll_height);
     }
@@ -397,31 +319,31 @@ CSingleCraw::processSpanElem(QString& keyWordRank,
   }
   this->Sleep(rand() % 500 + 500);
 
+  // get the refuse url
   QString refuse_url = "";
-  QStringList url_tmp_list = span_str.replace("...", " ").trimmed().split(" ");
+  QStringList url_tmp_list = spanStr.replace("...", " ").trimmed().split(" ");
   if (url_tmp_list.count() >= 1)
   {
     refuse_url = QUrl("http://" + url_tmp_list[0]).host();
   }
 
-  qDebug() << "span_str:" << span_str << " : " << url_tmp_list;
+  qDebug() << "spanStr:" << spanStr << " : " << url_tmp_list;
   pageloader->m_mynetworkAccessManager.SetRefuseUrl(refuse_url);
-  qDebug() << "Link Pos scrolled:" << x << y;
-  QTest::mouseEvent(QTest::MouseClick, pageloader->GetWebView(), Qt::LeftButton, Qt::NoModifier, QPoint(x, y), -1);
+  qDebug() << "Link Pos scrolled:" << clickXPos << clickYPos;
+
+  // click the clickLinkPos, but don't show the page
+  QTest::mouseEvent(QTest::MouseClick, pageloader->GetWebView(), Qt::LeftButton, Qt::NoModifier, QPoint(clickXPos, clickYPos), -1);
   this->rank_ = keyWordRank;
   this->Sleep(rand() % 1000 + 2000);
 
   SeoRankRepotThread seo_rank_report_thread;
   seo_rank_report_thread.id_   = this->id_;
-  //seo_rank_report_thread.rank_ = resultBlockCollection[resultBlockIdex].attribute("id");
   seo_rank_report_thread.rank_ = this->rank_;
   seo_rank_report_thread.run();
 
   this->Sleep(rand() % 500 + 1000);
-  //is_mousedown_ganji = true;
 
   return true;
-
 }
 
 void
@@ -434,15 +356,14 @@ CSingleCraw::gotoNextPage(int pageIdx,
 {
   qDebug() << "Target url not found in current page index:" << pageIdx;
   QWebElementCollection page_coll = dom.findAll("*#page a");        // make sure 3: p[id=page] a
-  //QWebElementCollection page_coll = dom.findAll("p[id=page] a");        // make sure 3: p[id=page] a
   for (int pidx = 0; pidx < page_coll.count(); pidx++)
   {
-    QWebElement rollPageBtn = page_coll[pidx];
-    if (rollPageBtn.toPlainText().trimmed() == QString::number(pageIdx + 1))
+    QWebElement clickLinkElement = page_coll[pidx];
+    if (clickLinkElement.toPlainText().trimmed() == QString::number(pageIdx + 1))
     {
       qDebug() << "Prepare to load page index:" << pageIdx + 1;
-      int x = rollPageBtn.geometry().left() + (rand() % rollPageBtn.geometry().width());
-      int y = rollPageBtn.geometry().top()  + (rand() % rollPageBtn.geometry().height()) - scroll_height;
+      int x = clickLinkElement.geometry().left() + (rand() % clickLinkElement.geometry().width());
+      int y = clickLinkElement.geometry().top()  + (rand() % clickLinkElement.geometry().height()) - scroll_height;
       qDebug() << "Target Page Btn Pos:" << x << y
                << "Window Height:" << windowHeight
                << "Scroll Bar Maximum" << scroll_bar_maximun;
@@ -513,8 +434,8 @@ CSingleCraw::getContentFromPages(bool& is_mousedown_ganji,
       QString keyWordRank = resultBlockCollection[resultBlockIdex].attribute("id");
       qDebug()<<"key word rank : "<< keyWordRank;
 
-      QWebElement rollPageBtn = resultBlockCollection[resultBlockIdex].findFirst("a");
-      //QWebElement spanElem = resultBlockCollection[resultBlockIdex].findFirst("font[size='-1'] span.g");       //make sure2
+      // get the click url link position
+      QWebElement clickLinkElement = resultBlockCollection[resultBlockIdex].findFirst("a");
       QWebElement spanElem;
 
       bool getRet = this->getSpanElem(spanElem, resultBlockCollection[resultBlockIdex]);
@@ -526,7 +447,7 @@ CSingleCraw::getContentFromPages(bool& is_mousedown_ganji,
 
       is_mousedown_ganji = this->processSpanElem(keyWordRank,
                                                       spanElem,
-                                                      rollPageBtn,
+                                                      clickLinkElement,
                                                       scroll_height,
                                                       windowHeight,
                                                       scroll_bar_maximun,

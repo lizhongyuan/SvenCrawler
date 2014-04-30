@@ -67,7 +67,8 @@ void
 SEOWorkThread::sendTask(vector<BotMessage> respTaskVector)
 {
     int ret = -2;
-    int upload_ok;
+    //int upload_ok;
+    bool upload_ok;
 
     NodeState curNodeState;
     curNodeState.node_id = "lizhongyuan";
