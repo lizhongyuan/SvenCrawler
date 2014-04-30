@@ -76,7 +76,8 @@ public:
                int& scroll_height,
                int& scroll_bar_maximun);
 
-  void
+  //void
+  bool
   processSpanElem(QString& keyWordRank,
                   QWebElement& span_elem,
                   QWebElement& a_elem,
@@ -84,10 +85,10 @@ public:
                   int& window_height,
                   int& scroll_bar_maximun,
                   QString target_url,
-                  CPageLoader*& pageloader,
-                  bool& is_click,
-                  bool& is_mousedown_ganji,
-                  bool& is_prepare_ganji);
+                  CPageLoader*& pageloader);
+                  //bool& is_click,
+                  //bool& is_mousedown_ganji,
+                  //bool& is_prepare_ganji);
 
   void
   waitFunction(QElapsedTimer& elapsed_timer,

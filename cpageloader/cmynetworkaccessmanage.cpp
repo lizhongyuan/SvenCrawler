@@ -5,6 +5,9 @@ CMyNetworkAccessManager::CMyNetworkAccessManager()
   refuse_url_ = "";
 }
 
+/*
+ * set the refuse url to this.refuse_url_
+ */
 void CMyNetworkAccessManager::SetRefuseUrl(QString url)
 {
   refuse_url_ = url;

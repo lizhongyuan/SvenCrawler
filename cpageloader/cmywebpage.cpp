@@ -26,7 +26,9 @@ CMyWebPage::CMyWebPage() {
         }
       }
       file.close();
-    } else {
+    }
+    else
+    {
       qDebug() << "Error:CMyWebPage::CMyWebPage(): Cannot open 'user_agent.txt'";
     }
   }

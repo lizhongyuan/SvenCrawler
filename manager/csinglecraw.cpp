@@ -244,9 +244,18 @@ CSingleCraw::getAndClickButton(QWebElement&   dom,
 
 
 bool
-CSingleCraw::getSpanElem(QWebElement& spanElem, QWebElement& curColl)
+CSingleCraw::getSpanElem(QWebElement& spanElem,
+                         QWebElement& curColl)
 {
   bool isExist = false;
+  spanElem = curColl.findFirst("font[size='-1'] span.g");
+  if (spanElem.isNull())
+  {
+    spanElem = curColl.findFirst("span.g"); //百度快照前面的
+    if(spanElem.isNull())
+        qDebug()<<"Fuck fuck fuck";
+    isExist = true;
+  }
   if (spanElem.isNull())
   {
     spanElem = curColl.findFirst("div.f13 span.g"); //百度快照前面的
@@ -264,12 +273,13 @@ CSingleCraw::getSpanElem(QWebElement& spanElem, QWebElement& curColl)
   return isExist;
 }
 
+/*
 void
 CSingleCraw::processSpanElem(QString& keyWordRank,
                              QWebElement& spanElem,
                              QWebElement& rollPageBtn,
                              int& scroll_height,
-                             int& window_height,
+                             int& windowHeight,
                              int& scroll_bar_maximun,
                              QString url_regex,
                              CPageLoader*& pageloader,
@@ -292,7 +302,7 @@ CSingleCraw::processSpanElem(QString& keyWordRank,
 
   if (is_click == true)
   {
-    while (y > window_height - (rand() % 100 + 30))
+    while (y > windowHeight - (rand() % 100 + 30))
     {
       int rand_scroll = 100 + rand() % 2;
 
@@ -340,13 +350,85 @@ CSingleCraw::processSpanElem(QString& keyWordRank,
     }
   }
 }
+*/
 
+
+//void
+bool
+CSingleCraw::processSpanElem(QString& keyWordRank,
+                             QWebElement& spanElem,
+                             QWebElement& rollPageBtn,
+                             int& scroll_height,
+                             int& windowHeight,
+                             int& scroll_bar_maximun,
+                             QString url_regex,
+                             CPageLoader*& pageloader)
+{
+  QString span_str = spanElem.toPlainText().trimmed();
+  url_regex = url_regex.replace("http://", "");
+  if (span_str.indexOf(url_regex) < 0 || InBlackList(span_str))
+  {
+      return false;
+  }
+
+  // get the scroller's position
+  int x = rollPageBtn.geometry().left() + (rand() % rollPageBtn.geometry().width());
+  int y = rollPageBtn.geometry().top()  + (rand() % rollPageBtn.geometry().height()) - scroll_height;
+
+
+  while (y > windowHeight - (rand() % 100 + 30))
+  {
+    int rand_scroll = 100 + rand() % 2;
+
+    if (scroll_height + rand_scroll < scroll_bar_maximun) // in the mid
+    {
+      y -= rand_scroll;               //向下移动rand_scroll
+      scroll_height += rand_scroll;   // same as above
+      pageloader->GetWebView()->page()->mainFrame()->scroll(0, rand_scroll);
+    }
+    else                                                  // to the end
+    {
+      int next_scroll = scroll_bar_maximun - scroll_height;
+      y -= next_scroll;
+      scroll_height += next_scroll;
+      pageloader->GetWebView()->page()->mainFrame()->scroll(0, scroll_height);
+    }
+    this->Sleep(rand() % 200 + 400);
+  }
+  this->Sleep(rand() % 500 + 500);
+
+  QString refuse_url = "";
+  QStringList url_tmp_list = span_str.replace("...", " ").trimmed().split(" ");
+  if (url_tmp_list.count() >= 1)
+  {
+    refuse_url = QUrl("http://" + url_tmp_list[0]).host();
+  }
+
+  qDebug() << "span_str:" << span_str << " : " << url_tmp_list;
+  pageloader->m_mynetworkAccessManager.SetRefuseUrl(refuse_url);
+  qDebug() << "Link Pos scrolled:" << x << y;
+  QTest::mouseEvent(QTest::MouseClick, pageloader->GetWebView(), Qt::LeftButton, Qt::NoModifier, QPoint(x, y), -1);
+  this->rank_ = keyWordRank;
+  this->Sleep(rand() % 1000 + 2000);
+
+  SeoRankRepotThread seo_rank_report_thread;
+  seo_rank_report_thread.id_   = this->id_;
+  //seo_rank_report_thread.rank_ = resultBlockCollection[resultBlockIdex].attribute("id");
+  seo_rank_report_thread.rank_ = this->rank_;
+  seo_rank_report_thread.run();
+
+  this->Sleep(rand() % 500 + 1000);
+  //is_mousedown_ganji = true;
+
+  return true;
+
+}
 
 void
 CSingleCraw::gotoNextPage(int pageIdx,
                           CPageLoader*& pageloader,
                           QWebElement& dom,
-                          int& window_height,
+                          int& windowHeight,
                           int& scroll_height,
                           int& scroll_bar_maximun)
 {
@@ -362,9 +444,9 @@ CSingleCraw::gotoNextPage(int pageIdx,
       int x = rollPageBtn.geometry().left() + (rand() % rollPageBtn.geometry().width());
       int y = rollPageBtn.geometry().top()  + (rand() % rollPageBtn.geometry().height()) - scroll_height;
       qDebug() << "Target Page Btn Pos:" << x << y
-               << "Window Height:" << window_height
+               << "Window Height:" << windowHeight
                << "Scroll Bar Maximum" << scroll_bar_maximun;
-      while (y > window_height - (rand() % 10 + 40))
+      while (y > windowHeight - (rand() % 10 + 40))
       {
         int rand_scroll = 100 + rand() % 2;
         if (scroll_height + rand_scroll < scroll_bar_maximun)
@@ -414,43 +496,42 @@ CSingleCraw::getContentFromPages(bool& is_mousedown_ganji,
     QWebElement dom = pageloader->GetWebElement();
     scroll_height = 0;
     qDebug() << " --> Now At Page:" << pageIdx;
-    int window_height = pageloader->GetWebView()->page()->mainFrame()->geometry().height();
+    int windowHeight = pageloader->GetWebView()->page()->mainFrame()->geometry().height();
     int scroll_bar_maximun = pageloader->GetWebView()->page()->mainFrame()->scrollBarMaximum(Qt::Vertical);
 
     // get all the blocks
     QWebElementCollection resultBlockCollection = dom.findAll("div.result");       // make sure1
+    qDebug()<<"div.result: "<<resultBlockCollection.count();
+
+    // traverse all the blocks
     for (int resultBlockIdex = 0;
          resultBlockIdex < resultBlockCollection.count();
          resultBlockIdex++)
     {
+      std::cout<<"resultBlockIdex:"<<resultBlockIdex<<endl;
+
       QString keyWordRank = resultBlockCollection[resultBlockIdex].attribute("id");
+      qDebug()<<"key word rank : "<< keyWordRank;
+
       QWebElement rollPageBtn = resultBlockCollection[resultBlockIdex].findFirst("a");
       //QWebElement spanElem = resultBlockCollection[resultBlockIdex].findFirst("font[size='-1'] span.g");       //make sure2
       QWebElement spanElem;
 
-      if(!this->getSpanElem(spanElem, rollPageBtn))
+      bool getRet = this->getSpanElem(spanElem, resultBlockCollection[resultBlockIdex]);
+      if(!getRet)
       {
         qDebug()<<"can't parse the result blocks in page";
         continue;
       }
 
-      /*
-       * 目前的条件, spanElem的content ,depends on fiv.f13 span.g
-       */
-      bool is_click = false;
-      bool is_prepare_ganji = false;
-
-      this->processSpanElem(keyWordRank,
-                            spanElem,
-                            rollPageBtn,
-                            scroll_height,
-                            window_height,
-                            scroll_bar_maximun,
-                            url_regex,
-                            pageloader,
-                            is_click,
-                            is_mousedown_ganji,
-                            is_prepare_ganji);
+      is_mousedown_ganji = this->processSpanElem(keyWordRank,
+                                                      spanElem,
+                                                      rollPageBtn,
+                                                      scroll_height,
+                                                      windowHeight,
+                                                      scroll_bar_maximun,
+                                                      url_regex,
+                                                      pageloader);
 
       // 4/5的可能
       if (is_mousedown_ganji == true)
@@ -474,7 +555,7 @@ CSingleCraw::getContentFromPages(bool& is_mousedown_ganji,
       gotoNextPage(pageIdx,
                    pageloader,
                    dom,
-                   window_height,
+                   windowHeight,
                    scroll_height,
                    scroll_bar_maximun);
     }
@@ -514,6 +595,7 @@ CSingleCraw::waitFunction(QElapsedTimer& elapsed_timer,
   this->Sleep(sleep_time);
 }
 
+
 bool
 CSingleCraw::keyWordProcess(QList<KeyWordItem>& word_list,
                             CPageLoader*& pageloader,
@@ -551,6 +633,8 @@ CSingleCraw::keyWordProcess(QList<KeyWordItem>& word_list,
     // 百度首页 输入第一个关键词
     QWebElement dom = pageloader->GetWebElement();
 
+    qDebug()<<dom.toPlainText().toUtf8();
+
     /*
     if (dom.toPlainText().toUtf8().indexOf("使用百度前必读") == -1) {
       qDebug() << "Can not open www.baidu.com";
@@ -584,8 +668,8 @@ CSingleCraw::keyWordProcess(QList<KeyWordItem>& word_list,
 
     this->Sleep(rand() % 3000 + 5000);
 
-    /*
     dom = pageloader->GetWebElement();
+    /*
     if (dom.toPlainText().indexOf("此内容系百度根据您的指令自动搜索的结果") == -1)
     {
       qDebug() << "Incomplete page. skip.";
@@ -677,6 +761,6 @@ void SeoRankRepotThread::run()
     qDebug() << "SeoRankReport:" << url;
     qDebug()<<"The id is "<<this->id_;
     qDebug()<<"The rand is "<<this->rank_;
-    system("pause");
+    //system("pause");
     http_get.doDownload(QUrl(url));
 }
