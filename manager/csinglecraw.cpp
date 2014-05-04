@@ -28,19 +28,10 @@ CSingleCraw::CSingleCraw(QObject *parent) : QObject(parent) {
   this->http_get_task_timer_.start(60000);
 }
 
-//void CSingleCraw::Start(vector<SimulatorTask> reqTaskVector, int spider_num)
 void CSingleCraw::Start(vector<BotMessage> reqTaskVector, int spider_num)
 {
   this->BaiduSEOTest(reqTaskVector, spider_num);
 }
-
-/*
-void
-CSingleCraw::Start(vector<SimulatorTask>& taskVector, int spider_num)
-{
-  this->BaiduSEOTest(taskVector, spider_num);
-}
-*/
 
 void CSingleCraw::QuitEventLoop()
 {
@@ -621,12 +612,12 @@ CSingleCraw::keyWordProcess(QList<KeyWordItem>& word_list,
       this->Sleep(1000);
       continue;
     }
+
     qDebug() << "Current Key Word:" << key_words << "Target Url:" << url_regex;
 
     QElapsedTimer elapsed_timer;
     elapsed_timer.restart();
 
-    //this->addCookies(pageloader);
     qDebug() << "Network Cookie List:" << this->cookieStruct_.networkCookieList;
     pageloader->SetUserAgent(this->cookieStruct_.userAgent);
     qDebug() << "User Agent:" << pageloader->GetUserAgent();
@@ -641,15 +632,17 @@ CSingleCraw::keyWordProcess(QList<KeyWordItem>& word_list,
 
     qDebug()<<dom.toPlainText().toUtf8();
 
-    /*
     if (dom.toPlainText().toUtf8().indexOf("使用百度前必读") == -1) {
       qDebug() << "Can not open www.baidu.com";
       this->Sleep(3000);
       continue;
     }
-    */
 
     QWebElement input = dom.findFirst("input#kw1");
+    if (input.geometry().width() < 200 || input.geometry().height() < 10)
+    {
+      QWebElement input = dom.findFirst("input#kw");
+    }
     if (input.geometry().width() < 200 || input.geometry().height() < 10)
     {
       qDebug() <<input.geometry().width();
