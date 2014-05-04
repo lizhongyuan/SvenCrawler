@@ -18,8 +18,8 @@
 
 #include "KeyWordItem.h"
 #include "cpageloader/cpageloader.h"
-//#include "SEOTaskStream/bot_client.h"
 #include "gen-cpp/octopus_crawler_types.h"
+#include "cookiestruct.h"
 
 using namespace std;
 
@@ -95,8 +95,9 @@ public:
                QList<KeyWordItem>& word_lsit,
                int& spider_num);
 
+
   void
-  addCookies(CPageLoader*& pageloader);
+  addCookies();
 
   QString getCurTime();
 
@@ -124,6 +125,7 @@ public slots:
 private:
   QString seo_task_list_;
   QMutex mutex_;
+  cookieStruct cookieStruct_;
 
 public:
   //void BaiduSEOTest(int spider_num); // baidu.com 刷百度SEO

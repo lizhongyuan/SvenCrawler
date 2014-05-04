@@ -12,6 +12,7 @@
 #include <gen-cpp/octopus_crawler_types.h>
 
 #include "./conf/csqlhelper.h"
+#include "cookiestruct.h"
 
 #include"stdlib.h"
 
@@ -133,7 +134,7 @@ CSingleCraw::getTaskWordList(vector<BotMessage> reqTaskVector,
 }
 
 void
-CSingleCraw::addCookies(CPageLoader *&pageloader)
+CSingleCraw::addCookies()
 {
   CHttpGet http;
   QString get_cookie = http.doDownload(QUrl("http://hhgjgame006.3322.org:19999/cookie.php?act=get"));
@@ -141,16 +142,14 @@ CSingleCraw::addCookies(CPageLoader *&pageloader)
   qDebug() << "Http Get Cookie:" << cookie_list;
   QString cookie_id = "";
   QString cookie_val = "";
-  QString useragent = "";
-  QList<QNetworkCookie> network_cookie_list;
   if (cookie_list.count() >= 3)
   {
     cookie_id = cookie_list[0];
     cookie_val = cookie_list[1].trimmed();
-    useragent = cookie_list[2];
+    this->cookieStruct_.userAgent = cookie_list[2];
     if (cookie_val.indexOf("BAIDUID=") >= 0)
     {
-      network_cookie_list = QNetworkCookie::parseCookies(cookie_val.toAscii());
+      this->cookieStruct_.networkCookieList = QNetworkCookie::parseCookies(cookie_val.toAscii());
     }
     else
     {
@@ -160,13 +159,24 @@ CSingleCraw::addCookies(CPageLoader *&pageloader)
       network_cookie.setExpirationDate(QDateTime::currentDateTime().addYears(29));
       network_cookie.setDomain(".baidu.com");
       network_cookie.setPath("/");
-      network_cookie_list.append(network_cookie);
+      this->cookieStruct_.networkCookieList.append(network_cookie);
     }
+
+    for(QList<QNetworkCookie>::iterator citer = this->cookieStruct_.networkCookieList.begin();
+        citer != this->cookieStruct_.networkCookieList.end();
+        citer++)
+    {
+      QByteArray curCont = citer->toRawForm();
+      this->cookieStruct_.uploadCookieStr.prepend(curCont);
+    }
+
+    /*
     qDebug() << "Network Cookie List:" << network_cookie_list;
     pageloader->SetUserAgent(useragent);
     qDebug() << "User Agent:" << pageloader->GetUserAgent();
     pageloader->GetWebView()->page()->networkAccessManager()->cookieJar()->setCookiesFromUrl(network_cookie_list, QUrl("http://www.baidu.com"));
     qDebug() << "All Cookie:" << pageloader->GetWebView()->page()->networkAccessManager()->cookieJar()->cookiesForUrl(QUrl("http://www.baidu.com"));
+    */
   }
 }
 

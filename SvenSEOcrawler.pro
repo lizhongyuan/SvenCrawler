@@ -136,7 +136,8 @@ HEADERS += \
     utils/Threading.h \
     gen-cpp/StaticLinkCenterService.h \
     gen-cpp/ExtractorService.h \
-    gen-cpp/net.h
+    gen-cpp/net.h \
+    manager/cookiestruct.h
 
 LIBS += -L$$PWD/../../../software/boost_1_49_0/bin/vc10/lib/ -llibboost_thread-vc100-mt-gd-1_49
 
