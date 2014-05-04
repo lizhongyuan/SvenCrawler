@@ -95,6 +95,9 @@ public:
                QList<KeyWordItem>& word_lsit,
                int& spider_num);
 
+  void
+  addCookies(CPageLoader*& pageloader);
+
   QString getCurTime();
 
   //void Start(vector<SimulatorTask> reqTaskVector, int spider_num);

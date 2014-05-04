@@ -25,7 +25,7 @@ namespace net {
 
     ///
     int BotMessageHandler::Init(const string &peer_ip, int peer_port, int socket_timeout, int check_interval){
-        node_id_ = "192.168.38.132";
+        node_id_ = "lizhongyuan";
         proxy_ip_ = peer_ip;
         proxy_port_ = peer_port;
         connection_timeout_ = socket_timeout;
