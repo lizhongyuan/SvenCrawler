@@ -9,6 +9,16 @@ SEOWorkThread::~SEOWorkThread()
       delete this->csingleCraw;
       this->csingleCraw = NULL;
   }
+  if(this->octopusServerConnPtr_ != NULL)
+  {
+      delete this->octopusServerConnPtr_;
+      this->csingleCraw = NULL;
+  }
+  if(this->confSettingPtr_ != NULL)
+  {
+      delete this->csingleCraw;
+      this->csingleCraw = NULL;
+  }
 }
 
 void

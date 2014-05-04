@@ -145,8 +145,6 @@ LIBS += -L$$PWD/../../../software/boost_1_49_0/bin/vc10/lib/ -llibboost_thread-v
 INCLUDEPATH += $$PWD/../../../software/boost_1_49_0
 DEPENDPATH += $$PWD/../../../software/boost_1_49_0
 
-#win32:!win32-g++ PRE_TARGETDEPS += $$PWD/../../../software/boost_1_49_0/bin/vc10/lib/libboost_thread-vc100-mt-gd-1_49.lib
-#else:win32-g++: PRE_TARGETDEPS += $$PWD/../../../software/boost_1_49_0/bin/vc10/lib/liblibboost_thread-vc100-mt-gd-1_49.a
 
 LIBS += -L$$PWD/libs/ -llibevent
 

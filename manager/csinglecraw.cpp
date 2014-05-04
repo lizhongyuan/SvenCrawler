@@ -20,11 +20,11 @@ using namespace std;
 
 CSingleCraw::CSingleCraw(QObject *parent) : QObject(parent) {
   connect(&(this->timer_), SIGNAL(timeout()), this, SLOT(QuitEventLoop()));
-  connect(&(this->http_get_task_timer_), SIGNAL(timeout()), this, SLOT(HttpGetSeoTask()));
+  //connect(&(this->http_get_task_timer_), SIGNAL(timeout()), this, SLOT(HttpGetSeoTask()));
   connect(&(this->timer_), SIGNAL(timeout()), this, SLOT(QuitEventLoop()), Qt::QueuedConnection);
 
-  connect(&(this->http_get_task_timer_), SIGNAL(timeout()), this, SLOT(HttpGetSeoTask()), Qt::QueuedConnection);
-  this->HttpGetSeoTask();
+  //connect(&(this->http_get_task_timer_), SIGNAL(timeout()), this, SLOT(HttpGetSeoTask()), Qt::QueuedConnection);
+  //this->HttpGetSeoTask();
   this->http_get_task_timer_.start(60000);
 }
 
@@ -37,26 +37,6 @@ void CSingleCraw::QuitEventLoop()
 {
   this->eventloop_.quit();
 }
-
-/*
- * get the SEO task
- */
-void
-CSingleCraw::HttpGetSeoTask()
-{
-  qDebug() << "HttpGetSeoTask";
-  QByteArray word_list =
-      "2489	招聘前台	ganji.com	100	0	8\n"
-      "2490	招聘客服	ganji.com	100	1	3\n"
-      "###done###";
-  this->mutex_.lock();
-  if (word_list.indexOf("###done###") >= 0)
-  {
-    this->seo_task_list_ = word_list;
-  }
-  this->mutex_.unlock();
-}
-
 
 /*
  * get the SEO task
@@ -83,7 +63,6 @@ QList<KeyWordItem>
 CSingleCraw::getTaskWordList(vector<BotMessage> reqTaskVector,
                              vector<BotMessage>& respTaskVector
                              )
-                             //bool& is_read_done
 {
     QList<KeyWordItem> keyWordItemList;
 
@@ -342,8 +321,6 @@ CSingleCraw::getSpanElem(QWebElement& spanElem,
 }
 
 
-
-//void
 bool
 CSingleCraw::processSpanElem(QString& keyWordRank,
                              QWebElement& spanElem,
@@ -413,6 +390,7 @@ CSingleCraw::processSpanElem(QString& keyWordRank,
 
   return true;
 }
+
 
 void
 CSingleCraw::gotoNextPage(int pageIdx,
@@ -593,7 +571,6 @@ CSingleCraw::keyWordProcess(QList<KeyWordItem>& word_list,
   bool keyWordProcessDone = false;
 
   srand(unsigned(time(NULL)));
-  uint pre_time = time(NULL);
   int wi = rand() % word_list.count();
 
   std::cout<<"keyWordList's size is"<<word_list.size()<<std::endl;
@@ -601,7 +578,6 @@ CSingleCraw::keyWordProcess(QList<KeyWordItem>& word_list,
   this->id_ = word_list[wi].task_id;
   QString key_words = word_list[wi].key_words;
   QString url_regex = word_list[wi].url_regex;
-  //while (time(NULL) - pre_time < 400 && )
 
   while(wi-- >= 0)
   {
@@ -618,12 +594,17 @@ CSingleCraw::keyWordProcess(QList<KeyWordItem>& word_list,
     QElapsedTimer elapsed_timer;
     elapsed_timer.restart();
 
+    /*
+     * anti spider
+     */
+    /*
     qDebug() << "Network Cookie List:" << this->cookieStruct_.networkCookieList;
     pageloader->SetUserAgent(this->cookieStruct_.userAgent);
     qDebug() << "User Agent:" << pageloader->GetUserAgent();
     pageloader->GetWebView()->page()->networkAccessManager()->cookieJar()->setCookiesFromUrl(this->cookieStruct_.networkCookieList, QUrl("http://www.baidu.com"));
     qDebug() << "All Cookie:" << pageloader->GetWebView()->page()->networkAccessManager()->cookieJar()->cookiesForUrl(QUrl("http://www.baidu.com"));
     qDebug() << "All Cookie2:" << this->cookieStruct_.uploadCookieStr;
+    */
 
     pageloader->Get(QUrl("http://www.baidu.com/"));
 
@@ -632,7 +613,8 @@ CSingleCraw::keyWordProcess(QList<KeyWordItem>& word_list,
 
     qDebug()<<dom.toPlainText().toUtf8();
 
-    if (dom.toPlainText().toUtf8().indexOf("使用百度前必读") == -1) {
+    //if (dom.toPlainText().toUtf8().indexOf("使用百度前必读") == -1) {
+    if (dom.toPlainText().toUtf8().indexOf("030173") == -1) {
       qDebug() << "Can not open www.baidu.com";
       this->Sleep(3000);
       continue;
@@ -671,14 +653,16 @@ CSingleCraw::keyWordProcess(QList<KeyWordItem>& word_list,
     this->Sleep(rand() % 3000 + 5000);
 
     dom = pageloader->GetWebElement();
-    /*
-    if (dom.toPlainText().indexOf("此内容系百度根据您的指令自动搜索的结果") == -1)
+    qDebug()<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~";
+    qDebug()<<dom.toPlainText().toUtf8();
+
+    //if (dom.toPlainText().indexOf("此内容系百度根据您的指令自动搜索的结果") == -1)
+    if (dom.toPlainText().indexOf("Baidu") == -1)
     {
       qDebug() << "Incomplete page. skip.";
       this->Sleep(3000);
       continue;
     }
-    */
 
     bool is_mousedown_ganji = false;
     int scroll_height = 0;
@@ -697,7 +681,6 @@ CSingleCraw::keyWordProcess(QList<KeyWordItem>& word_list,
 
     keyWordProcessDone = true;
 
-    //void waitFunction(QElapsedTimer& elapsed_timer)
     this->waitFunction(elapsed_timer,
                           word_list,
                           spider_num);
@@ -722,15 +705,12 @@ CSingleCraw::BaiduSEOTest(vector<BotMessage> reqTaskVector,
       return respTaskVector;
     }
 
-    //bool is_read_done = false;
-
     /*
      * build the keyWordItemList
      */
     QList<KeyWordItem> keyWordItemList = this->getTaskWordList(reqTaskVector,
                                                                respTaskVector
                                                                );
-                                                               //is_read_done
 
     qDebug() << "keyWordItemList count():" << keyWordItemList.count();
 
@@ -741,7 +721,6 @@ CSingleCraw::BaiduSEOTest(vector<BotMessage> reqTaskVector,
         return respTaskVector;
     }
 
-    // need ret
     if(!this->keyWordProcess(keyWordItemList,
                          pageloader,
                          spider_num))
@@ -763,6 +742,5 @@ void SeoRankRepotThread::run()
     qDebug() << "SeoRankReport:" << url;
     qDebug()<<"The id is "<<this->id_;
     qDebug()<<"The rand is "<<this->rank_;
-    //system("pause");
     http_get.doDownload(QUrl(url));
 }

@@ -17,6 +17,20 @@ GetBotMsgThread::run()
     }
 }
 
+GetBotMsgThread::~GetBotMsgThread()
+{
+    if(this->octopusServerConnPtr_ != NULL)
+    {
+        delete this->octopusServerConnPtr_;
+        this->octopusServerConnPtr_ = NULL;
+    }
+    if(this->confSettingPtr_ != NULL)
+    {
+        delete this->confSettingPtr_;
+        this->confSettingPtr_ = NULL;
+    }
+}
+
 int
 GetBotMsgThread::getTask()
 {
@@ -24,10 +38,12 @@ GetBotMsgThread::getTask()
 
     bool isGetBotTask;
 
+    /*
     NodeState curNodeState;
     curNodeState.node_id = "lizhongyuan";
     curNodeState.cpu_state = "";
     curNodeState.mem_state = "";
+    */
 
     this->getMutex_.lock();
     do

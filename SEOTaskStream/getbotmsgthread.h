@@ -35,6 +35,8 @@ public:
     {
     }
 
+    ~GetBotMsgThread();
+
     int
     getTask();
 

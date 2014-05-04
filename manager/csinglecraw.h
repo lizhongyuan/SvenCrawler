@@ -6,7 +6,6 @@
 #endif
 
 #include <time.h>
-//#include <unistd.h>
 
 #include<vector>
 
@@ -29,25 +28,8 @@ class CSingleCraw : public QObject
 public:
   explicit CSingleCraw(QObject *parent = 0);
 
-  /*
-  QList<KeyWordItem> getTaskWordList(QStringList&  key_word_lines,
-                                     bool&         is_read_done);
-                                     */
-
-  /*
-  QList<KeyWordItem> getTaskWordList(vector<SimulatorTask> reqTaskVector,
-                                     vector<SimulatorTask>& respTaskVector,
-                                     bool& is_read_done);
-  */
-
   QList<KeyWordItem> getTaskWordList(vector<BotMessage> reqTaskVector,
                                      vector<BotMessage>& respTaskVector);
-                                     //bool& is_read_done);
-
-  /*
-  QList<KeyWordItem> getTaskList(vector<SimulatorTask>  taskVector,
-                                 bool&                  is_read_done);
-  */
 
   CPageLoader* pageLoaderFactory();
   void getAndClickInputPos(CPageLoader*& pageloader,
@@ -101,7 +83,6 @@ public:
 
   QString getCurTime();
 
-  //void Start(vector<SimulatorTask> reqTaskVector, int spider_num);
   void Start(vector<BotMessage> reqTaskVector, int spider_num);
 
   QEventLoop eventloop_;
@@ -111,15 +92,12 @@ public:
   QString id_;
   QString rank_;
 
-  //vector<SimulatorTask> SEOTaskVector_;
-  //vector<SimulatorTask> respVector_;
-
   void Sleep(int msec);
 
 public slots:
   void QuitEventLoop();
 
-  void HttpGetSeoTask();
+  //void HttpGetSeoTask();
   void ThriftGetSeoTask(vector<SimulatorTask> SEOTaskVector);
 
 private:
@@ -128,11 +106,6 @@ private:
   cookieStruct cookieStruct_;
 
 public:
-  //void BaiduSEOTest(int spider_num); // baidu.com 刷百度SEO
-  /*
-  vector<SimulatorTask> BaiduSEOTest(vector<SimulatorTask> reqTaskVector,
-                                     int spider_num); // baidu.com 刷百度SEO
-                                     */
   vector<BotMessage> BaiduSEOTest(vector<BotMessage> reqTaskVector,
                                      int spider_num); // baidu.com 刷百度SEO
 };
