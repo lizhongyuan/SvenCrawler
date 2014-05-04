@@ -14,7 +14,8 @@
 #include"QSettings"
 #include"boost/thread.hpp"
 
-#include"bot_client.h"
+//#include"bot_client.h"
+#include "gen-cpp/net.h"
 
 
 namespace ganji { namespace crawler { namespace octopus_crawler { namespace downloader {

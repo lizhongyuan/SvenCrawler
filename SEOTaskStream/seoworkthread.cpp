@@ -93,8 +93,8 @@ SEOWorkThread::sendTask(vector<BotMessage> respTaskVector)
       {
         try
         {
-          upload_ok = this->octopusServerConnPtr_->UploadBotTask(respTaskVector,
-                                                                 curNodeState);
+          upload_ok = this->octopusServerConnPtr_->UploadBotTask(respTaskVector);
+                                                                 //curNodeState);
           ret = 0;
           break;
         }

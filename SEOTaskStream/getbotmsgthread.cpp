@@ -46,8 +46,8 @@ GetBotMsgThread::getTask()
         try
         {
           isGetBotTask = this->octopusServerConnPtr_->GetBotTask(BotTasktypes::type::KSEOTASK,
-                                                                  this->reqTaskVector_,
-                                                                  curNodeState);
+                                                                  this->reqTaskVector_);
+                                                                  //curNodeState);
           //cout<<"???????????????????????????????"<<endl;
           if(isGetBotTask != true)
           {

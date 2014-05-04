@@ -37,7 +37,9 @@ SOURCES += main.cpp \
     manager/csinglecraw.cpp \
     SEOTaskStream/seoworkthread.cpp \
     SEOTaskStream/getbotmsgthread.cpp \
-    SEOTaskStream/seocontroller.cpp
+    SEOTaskStream/seocontroller.cpp \
+    gen-cpp/StaticLinkCenterService.cpp \
+    gen-cpp/ExtractorService.cpp
 
 OTHER_FILES += \
     conf/user_agent.txt \
@@ -130,7 +132,11 @@ HEADERS += \
     manager/KeyWordItem.h \
     SEOTaskStream/seoworkthread.h \
     SEOTaskStream/getbotmsgthread.h \
-    SEOTaskStream/seocontroller.h
+    SEOTaskStream/seocontroller.h \
+    utils/Threading.h \
+    gen-cpp/StaticLinkCenterService.h \
+    gen-cpp/ExtractorService.h \
+    gen-cpp/net.h
 
 LIBS += -L$$PWD/../../../software/boost_1_49_0/bin/vc10/lib/ -llibboost_thread-vc100-mt-gd-1_49
 
