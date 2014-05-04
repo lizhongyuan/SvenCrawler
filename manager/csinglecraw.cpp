@@ -103,6 +103,8 @@ CSingleCraw::getTaskWordList(vector<BotMessage> reqTaskVector,
       KeyWordItem kwi;
       BotMessage curRespTask;
 
+      this->addCookies();
+
       kwi.task_id = QString::number(iter->simulator_task.req_item.task_id);
       kwi.click_count = iter->simulator_task.req_item.click_count;
       kwi.city = QString::fromStdString(iter->simulator_task.req_item.city);
@@ -111,14 +113,14 @@ CSingleCraw::getTaskWordList(vector<BotMessage> reqTaskVector,
 
       curRespTask.simulator_task.resp_item.task_id = iter->simulator_task.req_item.task_id;
       curRespTask.simulator_task.resp_item.target_url = iter->simulator_task.req_item.url_regex;
-      curRespTask.simulator_task.resp_item.cookie = "";
-      //curRespTask.simulator_task.resp_item.node_id = "lizhongyuan";
+      curRespTask.simulator_task.resp_item.cookie = this->cookieStruct_.uploadCookieStr.toStdString();
+      curRespTask.simulator_task.resp_item.ip = this->getLocalIP().toStdString();
       curRespTask.simulator_task.resp_item.time_stamp = this->getCurTime().toStdString();
       curRespTask.bot_task_types = BotTasktypes::type::KSEOTASK;
 
       QString localHostName = QHostInfo::localHostName();
       QHostInfo info = QHostInfo::fromName(localHostName);
-      curRespTask.simulator_task.resp_item.ip = info.addresses()[0].toString().toStdString();
+      //curRespTask.simulator_task.resp_item.ip = info.addresses()[0].toString().toStdString();
 
       std::cout<<"The IP is: "<<curRespTask.simulator_task.resp_item.ip<<std::endl;
       curRespTask.simulator_task.resp_item.node_id = 796;
@@ -131,6 +133,26 @@ CSingleCraw::getTaskWordList(vector<BotMessage> reqTaskVector,
       }
     }
     return keyWordItemList;
+}
+
+QString
+CSingleCraw::getLocalIP()
+{
+  for(int i = 0; i < QNetworkInterface().allAddresses().size(); i++)
+  {
+    QString curIP = QNetworkInterface().allAddresses().at(i).toString();
+
+    QString pattern("((?:(?:25[0-5]|2[0-4]\\d|((1\\d{2})|([1-9]?\\d)))\.){3}(?:25[0-5]|2[0-4]\\d|((1\\d{2})|([1-9]?\\d))))");
+    QRegExp rx(pattern);
+
+    bool match = rx.exactMatch(curIP);
+    if(match && curIP.compare("127.0.0.1"))
+    {
+        return curIP;
+    }
+  }
+
+  return NULL;
 }
 
 void
@@ -605,6 +627,12 @@ CSingleCraw::keyWordProcess(QList<KeyWordItem>& word_list,
     elapsed_timer.restart();
 
     //this->addCookies(pageloader);
+    qDebug() << "Network Cookie List:" << this->cookieStruct_.networkCookieList;
+    pageloader->SetUserAgent(this->cookieStruct_.userAgent);
+    qDebug() << "User Agent:" << pageloader->GetUserAgent();
+    pageloader->GetWebView()->page()->networkAccessManager()->cookieJar()->setCookiesFromUrl(this->cookieStruct_.networkCookieList, QUrl("http://www.baidu.com"));
+    qDebug() << "All Cookie:" << pageloader->GetWebView()->page()->networkAccessManager()->cookieJar()->cookiesForUrl(QUrl("http://www.baidu.com"));
+    qDebug() << "All Cookie2:" << this->cookieStruct_.uploadCookieStr;
 
     pageloader->Get(QUrl("http://www.baidu.com/"));
 
@@ -622,7 +650,10 @@ CSingleCraw::keyWordProcess(QList<KeyWordItem>& word_list,
     */
 
     QWebElement input = dom.findFirst("input#kw1");
-    if (input.geometry().width() < 200 || input.geometry().height() < 10) {
+    if (input.geometry().width() < 200 || input.geometry().height() < 10)
+    {
+      qDebug() <<input.geometry().width();
+      qDebug() <<input.geometry().height();
       qDebug() << "Fatal Error: Strange kw input.";
       this->Sleep(60000);
       continue;

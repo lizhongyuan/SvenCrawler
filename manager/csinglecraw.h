@@ -29,7 +29,7 @@ class CSingleCraw : public QObject
 public:
   explicit CSingleCraw(QObject *parent = 0);
 
-    /*
+  /*
   QList<KeyWordItem> getTaskWordList(QStringList&  key_word_lines,
                                      bool&         is_read_done);
                                      */
@@ -86,9 +86,6 @@ public:
                   int& scroll_bar_maximun,
                   QString target_url,
                   CPageLoader*& pageloader);
-                  //bool& is_click,
-                  //bool& is_mousedown_ganji,
-                  //bool& is_prepare_ganji);
 
   void
   waitFunction(QElapsedTimer& elapsed_timer,
@@ -98,6 +95,9 @@ public:
 
   void
   addCookies();
+
+  QString
+  getLocalIP();
 
   QString getCurTime();
 

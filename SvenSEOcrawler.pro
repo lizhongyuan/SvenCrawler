@@ -43,7 +43,8 @@ SOURCES += main.cpp \
 
 OTHER_FILES += \
     conf/user_agent.txt \
-    conf/settings.ini
+    conf/settings.ini \
+    conf/crawler_bot_conf.ini
 
 HEADERS += \
     cpageloader/cpageloader.h \

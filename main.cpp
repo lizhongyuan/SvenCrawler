@@ -26,6 +26,13 @@ void SigTerm(int x) {
   exit(0);
 }
 
+QString
+getLocalPath()
+{
+    QString runPath = QCoreApplication::applicationDirPath();
+    return runPath;
+}
+
 int main(int argc, char *argv[])
 {
   QApplication a(argc, argv);
@@ -39,9 +46,13 @@ int main(int argc, char *argv[])
   signal(SIGHUP,  SigTerm);
 #endif
 
-  QSettings* seoSetting = new QSettings("D:\\crawler_bot_conf.ini",  QSettings::IniFormat);
+  //QSettings* seoSetting = new QSettings("D:\\crawler_bot_conf.ini",  QSettings::IniFormat);
+  QSettings* seoSetting = new QSettings("./conf/crawler_bot_conf.ini",  QSettings::IniFormat);
 
   SEOController seoController;
+
+  QString runPath = getLocalPath();
+  qDebug()<<runPath;
 
   seoController.Init(seoSetting);
   seoController.Work();

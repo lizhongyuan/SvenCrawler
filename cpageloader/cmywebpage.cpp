@@ -14,6 +14,7 @@ CMyWebPage::CMyWebPage() {
     QTime time = QTime::currentTime();
     qsrand(time.msec()+time.second()*1000);
     // 读取user-agent文件。
+    //QFile file(CConf::GetConfPath("./conf/user_agent.txt"));
     QFile file(CConf::GetConfPath("user_agent.txt"));
     if (file.open(QIODevice::ReadOnly) == true) {
       while (!file.atEnd()) {
